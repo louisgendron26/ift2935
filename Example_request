@@ -1,0 +1,237 @@
+BIN 3002 - TP1
+Nom : Agathe Casgrain-Cyr (20022308)
+
+QUESTIONS 
+
+a) Combien de cas (classe=1) et de contrôle (classe=0) ont été recruté par chaque centre de recherche?
+
+
+SELECT inv.current_center, pi.classe, COUNT(*) FROM phenotypic_infos pi, investigators inv WHERE inv.inv_id = pi.inv_id GROUP BY inv.current_center, pi.classe; 
+
+
++---------------------------+--------+----------+
+| current_center            | classe | COUNT(*) |
++---------------------------+--------+----------+
+| CHUM Notre-Dame           |      0 |      105 |
+| CHUM Notre-Dame           |      1 |       85 |
+| CHUM St-Luc               |      0 |      116 |
+| CHUM St-Luc               |      1 |       97 |
+| Cincinnati Memorial       |      0 |      101 |
+| Cincinnati Memorial       |      1 |       90 |
+| Coruscant Mercy Hospital  |      0 |      113 |
+| Coruscant Mercy Hospital  |      1 |       97 |
+| CUSM Royal Victoria       |      0 |      306 |
+| CUSM Royal Victoria       |      1 |      242 |
+| Mass General Hospital     |      0 |      407 |
+| Mass General Hospital     |      1 |      346 |
+| Tatooine St-Wookie Clinic |      0 |       86 |
+| Tatooine St-Wookie Clinic |      1 |       67 |
++---------------------------+--------+----------+
+
+
+
+b)  Combien de cas (classe=1) et de contrôle (classe=0) ont été recruté par chaque investigateur?
+
+
+SELECT inv.inv_id, inv.inv_name, pi.classe, COUNT(*) FROM phenotypic_infos pi, investigators inv WHERE inv.inv_id = pi.inv_id GROUP BY inv.inv_id, pi.classe;
+
+
++--------+-------------------+--------+----------+
+| inv_id | inv_name          | classe | COUNT(*) |
++--------+-------------------+--------+----------+
+|      1 | Brel, Jacques     |      0 |      116 |
+|      1 | Brel, Jacques     |      1 |       97 |
+|      2 | De Woulfe, Jean   |      0 |      105 |
+|      2 | De Woulfe, Jean   |      1 |       85 |
+|      3 | Harrison, Georges |      0 |      101 |
+|      3 | Harrison, Georges |      1 |       84 |
+|      4 | Jones, John Paul  |      0 |      108 |
+|      4 | Jones, John Paul  |      1 |       95 |
+|      5 | Lennon, John      |      0 |      111 |
+|      5 | Lennon, John      |      1 |       79 |
+|      6 | McCartney, Paul   |      0 |       76 |
+|      6 | McCartney, Paul   |      1 |       86 |
+|      7 | Pringle, Chip     |      0 |      103 |
+|      7 | Pringle, Chip     |      1 |       68 |
+|      8 | Simmons, Gene     |      0 |      101 |
+|      8 | Simmons, Gene     |      1 |       90 |
+|      9 | Solo, Han         |      0 |       86 |
+|      9 | Solo, Han         |      1 |       67 |
+|     10 | Starr, Ringo      |      0 |      112 |
+|     10 | Starr, Ringo      |      1 |       86 |
+|     11 | Starr, Ringo      |      0 |      102 |
+|     11 | Starr, Ringo      |      1 |       90 |
+|     12 | Vader, Darth      |      0 |      113 |
+|     12 | Vader, Darth      |      1 |       97 |
++--------+-------------------+--------+----------+
+
+
+
+c) Combien y-a-t-il de femmes (gender=1) fumeuses (smoker=1) dans les cas (1)? Dans les contrôles (0)?
+
+
+SELECT gender, smoker, classe, COUNT(*) FROM phenotypic_infos WHERE gender='1' AND smoker='1' GROUP BY classe;
+
+
++--------+--------+--------+----------+
+| gender | smoker | classe | COUNT(*) |
++--------+--------+--------+----------+
+|      1 |      1 |      0 |      190 |
+|      1 |      1 |      1 |      148 |
++--------+--------+--------+----------+
+
+
+
+d) Quelle est la concentration moyenne d’ADN obtenue dans tous les échantillons?
+
+
+SELECT AVG(conc) FROM biobank_dna; 
+
+
++-----------+
+| AVG(conc) |
++-----------+
+|  424.3897 |
++-----------+
+
+
+
+e) À qui appartiennent les échantillons d’ARN de la boite 37?
+
+
+SELECT box_id, rna_sample_id, study_id FROM biobank_rna WHERE box_id = '37';
+
+
++--------+---------------+-------------+
+| box_id | rna_sample_id | study_id    |
++--------+---------------+-------------+
+|     37 | R10940        | 001_60185   |
+|     37 | R12512        | 003_57093   |
+|     37 | R17363        | 003_53349   |
+|     37 | R19920        | Z2-68002    |
+|     37 | R22280        | KI-SS_85520 |
+|     37 | R24157        | Y1_73130    |
+|     37 | R26080        | 003_61880   |
+|     37 | R27472        | KI-SS_79992 |
+|     37 | R31958        | KI-SS_63329 |
+|     37 | R33086        | 004_68427   |
+|     37 | R34409        | Z2-82480    |
+|     37 | R40783        | 004_51962   |
+|     37 | R41580        | KI-SS_78585 |
+|     37 | R41770        | Z-55029     |
+|     37 | R50189        | AC_53433    |
+|     37 | R50531        | C-62457     |
+|     37 | R52268        | 002_88657   |
+|     37 | R54776        | Z2-89643    |
+|     37 | R55037        | 003_66724   |
+|     37 | R57341        | Z2-75329    |
+|     37 | R57402        | AC_77571    |
+|     37 | R58615        | 004_98684   |
+|     37 | R60150        | 001_99558   |
+|     37 | R61141        | 002_56687   |
+|     37 | R61522        | 002_85702   |
+|     37 | R61651        | C-81678     |
+|     37 | R62668        | Y1_78108    |
+|     37 | R62964        | 001_72665   |
+|     37 | R63576        | KI-SS_63414 |
+|     37 | R63895        | Z-59087     |
+|     37 | R64878        | C-60928     |
+|     37 | R66010        | 002_92465   |
+|     37 | R66547        | 001_61578   |
+|     37 | R68844        | AC_93523    |
+|     37 | R70250        | Y1_94873    |
+|     37 | R70759        | Z-88612     |
+|     37 | R71113        | 001_78296   |
+|     37 | R71565        | KI-SS_61898 |
+|     37 | R71789        | 003_97958   |
+|     37 | R72731        | Z2-67455    |
+|     37 | R73172        | 004_82379   |
+|     37 | R75308        | KI-SS_81216 |
+|     37 | R76159        | AC_93293    |
+|     37 | R79676        | C-67229     |
+|     37 | R80565        | Z2-78904    |
+|     37 | R80664        | AC_50266    |
+|     37 | R81107        | Z-88007     |
+|     37 | R83148        | 004_53715   |
+|     37 | R84084        | Z2-84582    |
+|     37 | R85124        | AC_59290    |
+|     37 | R85561        | KI-SS_79062 |
+|     37 | R90152        | C-90587     |
+|     37 | R92067        | C-91191     |
+|     37 | R92296        | Y1_72028    |
+|     37 | R92547        | B-85669     |
+|     37 | R94365        | 002_89408   |
+|     37 | R94841        | KI-SS_97835 |
+|     37 | R95844        | AC_91343    |
+|     37 | R96875        | 003_83225   |
+|     37 | R98297        | Z2-62622    |
+|     37 | R99601        | Z2-71013    |
++--------+---------------+-------------+
+
+
+
+f) Combien de participants ont fournis des échantillons d’ARN ayant un indice d’intégrité RIN supérieur à 8,4?
+
+
+SELECT COUNT(DISTINCT study_id) FROM biobank_rna WHERE RIN > 8.4;
+
+
++--------------------------+
+| COUNT(DISTINCT study_id) |
++--------------------------+
+|                     2112 |
++--------------------------+
+
+
+
+g) Quels sont la distribution de la collecte des échantillons de tissus quant à leur localisation, c-à-d., combien de biopsies à chaque localisation?
+
+
+SELECT location, COUNT(tissue_sample_id) FROM biobank_tissue GROUP BY location;
+
+
++------------------+-------------------------+
+| location         | COUNT(tissue_sample_id) |
++------------------+-------------------------+
+| colon_ascending  |                     595 |
+| colon_descending |                     699 |
+| colon_transverse |                     667 |
+| ileum            |                     693 |
+| rectum           |                     628 |
++------------------+-------------------------+
+
+
+
+h) Pour les 10 premiers SNP classés par ordre croissant, donnez le nombre d’homozygotes (LENGTH(val)=1) pour chaque allèle ainsi que le nombre d’hétérozygotes (LENGTH(val)=2).
+
+
+SELECT DISTINCT marker, LENGTH(val), COUNT(LENGTH(val)) FROM genotype_data_exp WHERE LENGTH(val)=1 or LENGTH(val)=2 GROUP BY LENGTH(val),marker ORDER BY marker LIMIT 20;
+
+
++-------------+-------------+--------------------+
+| marker      | LENGTH(val) | COUNT(LENGTH(val)) |
++-------------+-------------+--------------------+
+| rs11130221  |           1 |               1528 |
+| rs11130221  |           2 |                728 |
+| rs11130234  |           2 |                760 |
+| rs11130234  |           1 |               1496 |
+| rs116413271 |           1 |               1497 |
+| rs116413271 |           2 |                759 |
+| rs116834078 |           1 |               1475 |
+| rs116834078 |           2 |                781 |
+| rs17080505  |           2 |                765 |
+| rs17080505  |           1 |               1491 |
+| rs17598137  |           1 |               1497 |
+| rs17598137  |           2 |                759 |
+| rs3197999   |           1 |               1659 |
+| rs3197999   |           2 |                597 |
+| rs35115732  |           1 |               1518 |
+| rs35115732  |           2 |                738 |
+| rs3870336   |           1 |               1526 |
+| rs3870336   |           2 |                730 |
+| rs41290716  |           1 |               1510 |
+| rs41290716  |           2 |                746 |
++-------------+-------------+--------------------+
+
+
+
