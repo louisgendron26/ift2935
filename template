@@ -1,0 +1,511 @@
+#!/usr/bin/env python3
+
+import pymysql as mdb
+
+# Faire la connection entre python et la base de données mySql nommée "p1091602_bin3002_tp1"
+connection = mdb.connect(
+	host='esilbac2.esi.umontreal.ca',
+	user='p1091602',
+	password='PcEIXmFA', 
+	db='p1091602_bin3002_tp1', 
+	charset='utf8mb4',) 
+
+###############################################################
+##                 Modification fichiers txt                 ##
+###############################################################
+
+# Fonction    : binary(file, var0, var1)
+# Description : fonction qui lit d'abord le fichier txt "file" puis
+# 				qui remplace toutes les valeurs correspondantes à "val0"
+#				par "0" et celles correspondantes à "val1" par "1". 
+#				Le fichier modifié écrase par la suite le fichier
+#				initial. 
+# Paramètres  :
+# 	file - string ; nom du fichier text (en .txt)
+#   var0 - string ; valeur à remplacer par "0"
+#   var1 - string ; valeur à remplacer par "1"
+#
+# Utilité 	  : Permet de simplifier les données en binarisant les variables
+#				ayant 2 valeurs de type string possibles. 
+
+def binary(file, val0, val1):
+	f = open(file,'r')
+	filedata = f.read()
+	f.close()
+
+	newdata = filedata.replace(val0,"0").replace(val1,"1")
+
+	f = open(file,'w')
+	f.write(newdata)
+	f.close()
+
+# Remplace tous les "control" par '0' et les "case" par '1' 
+# de la colonne Classe dans le fichier "phenotypic_infos.txt"
+binary('phenotypic_infos.txt', 'control', 'case')
+
+# Remplace tous les "normal" par '0' et les "diseased" par '1' 
+# de la colonne Location dans le fichier "biobank_rna.txt"
+binary('biobank_rna.txt', 'normal', 'diseased')
+
+# Remplace tous les "no" par '0' et les "yes" par '1' 
+# de la colonne After treatment dans le fichier "biobank_rna.txt"
+binary('biobank_rna.txt', 'no', 'yes')
+
+# Remplace tous les "normal" par '0' et les "diseased" par '1' 
+# de la colonne Diseased state dans le fichier "biobank_tissue.txt"
+binary('biobank_tissue.txt', 'normal', 'diseased')
+
+# Remplace tous les "no" par '0' et les "yes" par '1' 
+# de la colonne Ab stained et Ab positive dans le fichier "biobank_tissue.txt"
+binary('biobank_tissue.txt', 'no', 'yes')
+
+
+# Fonction    : decimal(file)
+# Description : fonction qui lit d'abord le fichier txt "file" puis
+# 				qui remplace toutes les ',' par '.'. Le fichier modifié
+#				écrase par la suite le fichier initial.
+# Paramètre   :
+# 	file - string ; nom du fichier text (en .txt)
+#
+# Utilité 	  : Les nombres décimaux dans mySql comprennent des '.', donc
+#				la fonction permet de s'assurer que les nombres décimaux 
+#				ne sont pas tronqués (ex: éviter que 8,4 deviennent 8) lors
+#				de l'insertion des valeurs dans les tables mySql.
+
+def decimal(file):
+	f = open(file,'r')
+	filedata = f.read()
+	f.close()
+
+	newdata = filedata.replace(',','.')
+
+	f = open(file,'w')
+	f.write(newdata)
+	f.close()
+
+# Remplace toutes les ',' par des '.' de la colonne "RIN" dans le fichier "biobank_rna.txt" 
+decimal("biobank_rna.txt")
+
+
+###############################################################
+##  CREATE TABLES dans DATABASE nommée p1091602_bin3002_tp1  ##
+###############################################################
+
+# Fonction    : create_tables(file)
+# Description : fonction qui crée chacune des tables mySql dans la base de données.
+#
+
+# EXPLICATION CHOIX FAITS OVERALL LORS DE LA CRÉATION DES TABLES :
+# -> Tout mettre en minuscule:
+#		permet de standardiser le nom des colonnes et ainsi d'éviter les erreurs d'appelation de colonne
+
+def create_tables():
+
+	# prepare a cursor object using cursor() method
+	with connection.cursor() as cursor:
+
+		# Drop TABLE s'il existe déjà
+		# -> Afin d'éviter les problèmes engendrés par les connections des clés étrangères,  
+		# 	 on commence par drop la table la plus récemment crée pour finir avec la table
+		#	 qui se trouve au début de la chaîne (crée en premier).
+		cursor.execute("DROP TABLE IF EXISTS genotype_data_exp")
+		cursor.execute("DROP TABLE IF EXISTS biobank_tissue")
+		cursor.execute("DROP TABLE IF EXISTS biobank_rna")
+		cursor.execute("DROP TABLE IF EXISTS biobank_dna")
+		cursor.execute("DROP TABLE IF EXISTS phenotypic_infos")
+		cursor.execute("DROP TABLE IF EXISTS investigators")
+
+		# Create table investigators
+		#
+		# EXPLICATION CHOIX FAITS :
+		# -> Ajout d'une colonne "inv_id" qui s'auto-incremente correspondante à l'ID de l'investigator:
+		#		"inv_id" est utilisé comme clé primaire de la table investigators permettant ainsi
+		#		d'assurer l'unicité de chaque entrée. 
+		# -> Utilisation de "inv" comme diminutif de investigators dans le nom des colonnes:
+		#		permet de simplifier l'appelation des colonnes
+		# -> Changement du nom "Collection_Center" par "current_center":
+		#		permet de clarifier le fait qu'il s'agit du centre où l'investigator se trouve présentement 
+		#		étant donnée qu'il y a notamment une colonne previous_center 
+		
+		inv = """CREATE TABLE investigators (
+	         inv_id INTEGER NOT NULL AUTO_INCREMENT,
+	         inv_name MEDIUMTEXT NOT NULL,
+	         contact_email MEDIUMTEXT NOT NULL,  
+	         current_center MEDIUMTEXT NOT NULL,
+	         previous_center MEDIUMTEXT NOT NULL,
+	         PRIMARY KEY (inv_id))"""	
+		cursor.execute(inv)
+
+		# Create table phenotypic_infos
+		#
+		# EXPLICATION CHOIX FAITS :
+		# -> Remplacer les colonnes "Investigator" et "Collection_Center" par une colonne "inv_id" correspondante
+		#	 aux mêmes valeurs retrouvées dans la colonne "inv_id" de la table investigators:
+		#		permet 1) de réduire la table "phenotypic_infos" en enlevant une colonne et 
+		#		2) de faire le lien entre la table "phenotypic_infos" et "investigators" en définissant
+		#		"inv_id" de la table "phenotypic_infos" comme clé étrangère.
+		# -> Définir "study_id" comme clé primaire de la table "phenotypic_infos":
+		#		étant donnée que chacune des valeurs sont uniques, cela permet d'assurer l'unicité de chaque entrée
+		# -> Définir DEFAULT NULL pour la colonne "age_diagnostic":
+		#		Certaine valeur dans le fichier "phenotypic_infos.txt" au niveau de la colonne "age_diagnostic" sont
+		#		représentées par un '.' signifiant qu'elles sont indéfnies (None). Dans ce cas-ci, cela permet donc de définir 
+		#		ces valeurs comme étant 'NULL' lors du remplissage de la table.
+
+		pi = """CREATE TABLE phenotypic_infos (
+			 study_id VARCHAR(40) NOT NULL,
+			 classe INT NOT NULL,
+			 inv_id INTEGER NOT NULL,
+			 gender INT NOT NULL,
+			 age_diagnostic INT DEFAULT NULL, 
+			 age_recrutment INTEGER NOT NULL,
+			 smoker INT NOT NULL,
+	         PRIMARY KEY (study_id))"""
+	         	
+		cursor.execute(pi)
+
+		# Create table biobank_dna
+		#
+		# EXPLICATION CHOIX FAITS :
+		# -> Définir "dna_sample_id" comme clé primaire de la table "biobank_dna":
+		#		étant donnée que chacune des valeurs sont uniques, cela permet d'assurer l'unicité de chaque entrée
+		# -> Définir la colonne "collection_date" comme type MEDIUMTEXT:
+		#		le type DATE engendre des problèmes de format. En effet, lors de l'insertion des valeurs dans
+		#		la table biobank_dna, les dates sont en format YYYY-MM-JJ ce qui ne correspond pas au format des dates
+		#		brutes qui sont plutôt de format JJ-MM-YY. Ainsi, cela permet de s'assurer que la date est exact lors de l'insertion
+		# -> Définir "study_id" comme clé étrangère de la table "biobank_dna":
+		#		permet de faire un lien entre la table "biobank_dna" et "phenotypic_infos"
+
+		dna = """CREATE TABLE biobank_dna (
+			 dna_sample_id VARCHAR(40) NOT NULL,
+			 study_id VARCHAR(40) NOT NULL,
+			 volume INTEGER NOT NULL,
+			 conc INTEGER NOT NULL,
+			 freezer_id INT NOT NULL,
+			 collection_date MEDIUMTEXT NOT NULL,
+	         PRIMARY KEY (dna_sample_id))"""
+	         	
+		cursor.execute(dna)
+
+		# Create table biobank_rna
+		#
+		# EXPLICATION CHOIX FAITS :
+		# -> Définir "rna_sample_id" comme clé primaire de la table "biobank_rna"
+		# 		étant donnée que chacune des valeurs sont uniques, cela permet d'assurer l'unicité de chaque entrée
+		# -> Définir "study_id" comme clé étrangère de la table "biobank_rna":
+		#		permet de faire un lien entre la table "biobank_rna" et "phenotypic_infos"
+		# -> Définir la colonne "collection_date" comme type MEDIUMTEXT:
+		#		le type DATE engendre des problèmes de format. En effet, lors de l'insertion des valeurs dans
+		#		la table biobank_rna, les dates sont en format YYYY-MM-JJ ce qui ne correspond pas au format des dates
+		#		brutes qui sont plutôt de format JJ-MM-YY. Ainsi, cela permet de s'assurer que la date est exact lors de l'insertion
+		# -> Définir la colonne "RIN" comme étant DECIMAL(10,1):
+		#		permet de toujours garder un chiffre après le '.' et ainsi s'assurer de l'exactitude des valeurs decimaux.
+
+		rna = """CREATE TABLE biobank_rna (
+			 rna_sample_id VARCHAR(40) NOT NULL,
+			 study_id VARCHAR(40) NOT NULL,
+			 diseased_state INT NOT NULL,
+			 after_treatment INT NOT NULL,
+			 volume INTEGER NOT NULL,
+			 conc INTEGER NOT NULL,
+			 RIN DECIMAL(10,1) NOT NULL,
+			 collection_date MEDIUMTEXT NOT NULL,
+			 freezer_id INT NOT NULL,
+			 box_id INTEGER NOT NULL,
+			 X INTEGER NOT NULL,
+			 Y INTEGER NOT NULL,
+	         PRIMARY KEY (rna_sample_id))"""
+	         	
+		cursor.execute(rna)
+
+		# Create table biobank_tissue
+		#
+		# EXPLICATION CHOIX FAITS :
+		# -> Ajout d'une colonne "tissue_sample_id" qui s'auto-incremente correspondante à l'ID de l'échantillon de tissue:
+		#		"tissue_sample_id" est utilisé comme clé primaire de la table "biobank_tissue" permettant ainsi
+		#		d'assurer l'unicité de chaque entrée. 
+		# -> Définir "study_id" comme clé étrangère de la table "biobank_tissue":
+		#		permet de faire un lien entre la table "biobank_tissue" et "phenotypic_infos"
+
+		tis = """CREATE TABLE biobank_tissue (
+			 tissue_sample_id INTEGER NOT NULL AUTO_INCREMENT,
+			 study_id VARCHAR(40) NOT NULL,
+			 location MEDIUMTEXT NOT NULL,
+			 diseased_state INT NOT NULL,
+			 operator INTEGER NOT NULL,
+			 ab_stained INT NOT NULL,
+			 ab_positive INT NOT NULL,
+			 block_id INTEGER NOT NULL,
+	         PRIMARY KEY (tissue_sample_id))"""
+	         	
+		cursor.execute(tis)
+
+		# Create table genotype_data_exp
+		# 
+		# EXPLICATION CHOIX FAITS : 
+		# -> Ajout d'une colonne "genotype_id" qui s'auto-incremente correspondante à l'ID de chacune des données de genotypage:
+		#		"genotype_id" est utilisé comme clé primaire de la table "genotype_data_exp" permettant ainsi
+		#		d'assurer l'unicité de chaque entrée. 
+		# -> Définir "dna_sample_id" comme clé étrangère de la table "genotype_data_exp":
+		#		permet de faire un lien entre la table "genotype_data_exp" et "biobank_dna"
+		# -> Changement du nom de la colonne "VALUES" par "val"
+		#		permet d'éviter des erreurs lors de lancement du script étant données que VALUES est un mot utilisé
+		#		dans la nomenclature de mySql.
+		# -> Définir DEFAULT NULL pour la colonne "val":
+		#		Certaine valeur dans le fichier "genotype_data_experiment.txt" au niveau de la colonne "val" sont
+		#		représentées par un '.' ou par ' ' signifiant qu'elles sont indéfnies (None). Dans ce cas-ci, cela permet donc de définir 
+		#		ces valeurs comme étant 'NULL' lors du remplissage de la table.
+
+		gde = """CREATE TABLE genotype_data_exp (
+			 genotype_id INTEGER NOT NULL AUTO_INCREMENT,
+			 dna_sample_id VARCHAR(40) NOT NULL,
+			 plate_id MEDIUMTEXT NOT NULL,
+			 position MEDIUMTEXT NOT NULL,
+			 marker MEDIUMTEXT NOT NULL,
+			 val MEDIUMTEXT DEFAULT NULL,
+			 quality MEDIUMTEXT NOT NULL,
+	         PRIMARY KEY (genotype_id))"""
+
+		cursor.execute(gde)
+
+		#
+		# Création des clés étrangères (Voir EXPLICATIONS plus haut)
+		#
+
+		# "inv_id" de la table "phenotypic_infos" utilisé comme clé étrangère connectée à "inv_id" de la table "investigators"
+		cursor.execute("ALTER TABLE phenotypic_infos ADD FOREIGN KEY (inv_id) REFERENCES investigators (inv_id)")
+
+		# "study_id" de la table "biobank_dna" utilisé comme clé étrangère connectée à "study_id" de la table "phenotypic_infos"
+		cursor.execute("ALTER TABLE biobank_dna ADD FOREIGN KEY (study_id) REFERENCES phenotypic_infos (study_id)")
+
+		# "study_id" de la table "biobank_rna" utilisé comme clé étrangère connectée à "study_id" de la table "phenotypic_infos"
+		cursor.execute("ALTER TABLE biobank_rna ADD FOREIGN KEY (study_id) REFERENCES phenotypic_infos (study_id)")
+
+		# "study_id" de la table "biobank_tissue" utilisé comme clé étrangère connectée à "study_id" de la table "phenotypic_infos"
+		cursor.execute("ALTER TABLE biobank_tissue ADD FOREIGN KEY (study_id) REFERENCES phenotypic_infos (study_id)")
+
+		# "dna_sample_id" de la table "genotype_data_exp" utilisé comme clé étrangère connectée à "dna_sample_id" de la table "biobank_dna"
+		cursor.execute("ALTER TABLE genotype_data_exp ADD FOREIGN KEY (dna_sample_id) REFERENCES biobank_dna (dna_sample_id)")
+
+	# Mise à jour de la base de donnée	
+	connection.commit()
+
+# Run fonction create_tables()
+create_tables() 
+
+
+###############################################################
+##                 INSERT values dans TABLES                 ##
+###############################################################
+
+# PROCESSUS GÉNÉRALE DES FONCTIONS PERMETTANT DE REMPLIR CHACUNE DES TABLES
+#
+#	1. Création du cursor 
+#			> with connection.cursor() as cursor:
+#
+#	2. Lecture du fichier text contenant les données à extraire
+#			>  with open("nom_du_fichier.txt", 'r') as f :
+#
+#	3. Création d'une variable "lines" contenant chacune des lignes du fichier text
+#			> lines = f.readlines()
+#
+#	4. Création d'une variable "header" qu'on initialise à '0' permettant d'indiquer qu'il s'agit
+#	   de la première ligne du fichier qu'on ne veut pas insérer dans la table, c'est-à-dire celle 
+#	   contenant le titre des colonnes du fichier. Une fois la première ligne passée, on attribut à 
+#	   la variable "header" la valeur de '1' indiquant qu'on peut commencer à remplir la table avec
+#	   toutes les prochaines lignes du fichier.
+#			> header = 0
+#
+#	5. Boucle for qui permet d'inserer chacune des lignes du fichier dans la table. Plus précisément,
+#	   pour chaque ligne (sauf la première ligne) on crée un tableau "values" contenant chacune des valeurs
+#	   correspondantes aux différentes colonnes. Pour ce faire, on indique que la ligne ("line") finit lors 
+#      d'un changement de lignes (line.rstrip("\n")) et que chaque valeur sur la ligne est délimitée par une 
+#	   tabulation (line.split("\t"))
+#			> for line in lines:
+#					if header == 0:
+#						header = 1
+#					else:
+#						values = line.rstrip("\n").split("\t")
+#
+#	6. Toujours dans la boucle for, pour chaque ligne on crée finalement une requête permettant d'insérer les 
+#	   valeurs extraites des fichiers text, soient les valeurs contenues dans le tableau "values" au niveau des 
+#	   bonnes colonnes de la table mySql via la methode execute().
+#			> cursor.execute("""INSERT INTO nom_table (nom_colonne_dans_table) VALUES (%s)""", (valeur_colonne_from_file))
+#
+
+
+# Remplissage table investigators via la fonction investigators()
+
+def investigators():
+	with connection.cursor() as cursor:
+		with open("investigators.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+
+					cursor.execute("""INSERT INTO investigators (inv_name, current_center, contact_email, previous_center) VALUES (%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3]))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function investigators()
+investigators()	
+
+
+# Remplissage table phenotypic_infos via la fonction phenotypic_infos()
+# 
+# PARTICULARITÉS :
+#	-> la colonne "inv_id" a été crée en faisant une requête à la table "investigators".
+#	   Plus précisément, la requête permet d'aller chercher la valeur "inv_id" de la table
+#	   "investigators" où "inv_name" from "investigators" =	"Investigators" from "phenotypic_infos.txt"	
+#	   ET où "current_center" from "investigators" = "Collection_Center" from "phenotypic_infos.txt".
+#	   Le résultat de la requête est ensuite récupéré via la méthode fetchone(). Étant donnée que le
+#	   résultat est sous forme de tableau, on doit ensuite extraire la valeur du tableau (inv_id_tab[0])
+#			> query = "SELECT inv_id FROM investigators WHERE inv_name = '{0}' AND current_center = '{1}'".format(inv_name, current_center)
+#		  	  cursor.execute(query)
+#		  	  inv_id_tab = cursor.fetchone()	
+#		  	  inv_id = inv_id_tab[0]
+
+def phenotypic_infos():
+	with connection.cursor() as cursor:
+		with open("phenotypic_infos.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+
+					study_id = values[0]
+					classe = values[1]
+					inv_name = values[2]
+					current_center = values[3]
+					gender = values[4]
+					age_diagnostic = values[5]
+					age_recrutment = values[6]
+					smoker = values[7]
+
+					query = "SELECT inv_id FROM investigators WHERE inv_name = '{0}' AND current_center = '{1}'".format(inv_name, current_center)
+					cursor.execute(query)
+					inv_id_tab = cursor.fetchone()	
+					inv_id = inv_id_tab[0]
+
+					# Si age_diagnostic est indifini (== '.'), alors on set la value à None
+					if age_diagnostic == '.':
+						cursor.execute("""INSERT INTO phenotypic_infos (study_id, classe, inv_id, gender, age_diagnostic, age_recrutment, smoker) VALUES (%s,%s,%s,%s,%s,%s,%s)""", (study_id, classe, inv_id, gender, None, age_recrutment, smoker))
+					else:
+						cursor.execute("""INSERT INTO phenotypic_infos (study_id, classe, inv_id, gender, age_diagnostic, age_recrutment, smoker) VALUES (%s,%s,%s,%s,%s,%s,%s)""", (study_id, classe, inv_id, gender, age_diagnostic, age_recrutment, smoker))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function phenotypic_infos()
+phenotypic_infos()
+
+
+# Remplissage table biobank_dna via la fonction biobank_dna()
+
+def biobank_dna():
+	with connection.cursor() as cursor:
+		with open("biobank_dna.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+
+					cursor.execute("""INSERT INTO biobank_dna (dna_sample_id, study_id, volume, conc, freezer_id, collection_date) VALUES (%s,%s,%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3], values[4], values[5]))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function biobank_dna()
+biobank_dna()
+
+
+# Remplissage table biobank_rna via la fonction biobank_rna()
+
+def biobank_rna():
+	with connection.cursor() as cursor:
+		with open("biobank_rna.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+
+					cursor.execute("""INSERT INTO biobank_rna (study_id, rna_sample_id, diseased_state, after_treatment, volume, conc, RIN, collection_date, freezer_id, box_id, X, Y) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], values[10], values[11]))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function biobank_rna()
+biobank_rna()
+
+
+# Remplissage table biobank_tissue via la fonction biobank_tissue()
+
+def biobank_tissue():
+	with connection.cursor() as cursor:
+		with open("biobank_tissue.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+
+					cursor.execute("""INSERT INTO biobank_tissue (study_id, location, diseased_state, operator, ab_stained, ab_positive, block_id) VALUES (%s,%s,%s,%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3], values[4], values[5], values[6]))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function biobank_tissue()
+biobank_tissue()	
+
+
+# Remplissage de la table genotype_data_exp via la fonction genotype_data_exp()
+
+def genotype_data_exp():
+	with connection.cursor() as cursor:
+		with open("genotype_data_experiment.txt", 'r') as f :
+			lines = f.readlines()
+			header = 0
+			for line in lines:
+				if header == 0:
+					header = 1
+				else:
+					values = line.rstrip("\n").split("\t")
+					val = values[4]
+
+					# Si val est indifini (== '.' ou ' '), alors on set la value à None
+					if val == '.' or val == '':
+						cursor.execute("""INSERT INTO genotype_data_exp (plate_id, dna_sample_id, position, marker, val, quality) VALUES (%s,%s,%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3], None, values[5]))
+					else:
+						cursor.execute("""INSERT INTO genotype_data_exp (plate_id, dna_sample_id, position, marker, val, quality) VALUES (%s,%s,%s,%s,%s,%s)""", (values[0], values[1], values[2], values[3], values[4], values[5]))
+
+		# Mise à jour de la base de donnée
+		connection.commit()
+
+# Run function genotype_data_exp()
+genotype_data_exp()
+		
+
+# Mise à jour de la base de donnée
+connection.commit() 
+
+# Fermeture de la connexion
+connection.close()  
+
+
+
+
