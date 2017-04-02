@@ -49,3 +49,27 @@ create table interet(
 ALTER TABLE interet ADD CONSTRAINT FK_INTERET_USER_ID FOREIGN KEY (USER_ID) REFERENCES ishare_user(user_id);
 ALTER TABLE interet ADD CONSTRAINT FK_INTERET_OBJET_ID FOREIGN KEY (OBJET_ID) REFERENCES objet(objet_id);
 
+create table maison(
+  annee NUMBER,
+  superficie NUMBER,
+  etage NUMBER,
+  chambre NUMBER,
+  meuble NUMBER,
+  stationnement NUMBER,
+  salle_bain NUMBER);
+ 
+create table velo(
+  marque VARCHAR2(30),
+  taille_cadre NUMBER,
+  vitesse NUMBER,
+  frein VARCHAR2(30),
+  taille_roue NUMBER,
+  type VARCHAR2(30));
+ 
+create table auto(
+  annee NUMBER,
+  marque VARCHAR2(30),
+  km NUMBER,
+  transmission VARCHAR2(30),
+  format VARCHAR2(30),
+  consommation NUMBER);
