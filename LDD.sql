@@ -1,17 +1,17 @@
-Voici les command line utilisee pour implanter la base de donnees sur ma session d'oracle
+#Voici les command line utilisee pour implanter la base de donnees sur ma session d'oracle
 
 
 create table ishare_user (
-USER_ID NUMBER not null,
-PRENOM VARCHAR2(20) not null,
-NOM VARCHAR2(20) not null,
-COURRIEL VARCHAR2(40) not null,
-NUMTEL NUMBER not null,
-CODE_POSTAL VARCHAR2(10) not null,
-NUMERO NUMBER,
-RUE VARCHAR2(20),
-PROVINCE VARCHAR2(4),
-VILLE VARCHAR2(20));
+  USER_ID NUMBER not null,
+  PRENOM VARCHAR2(20) not null,
+  NOM VARCHAR2(20) not null,
+  COURRIEL VARCHAR2(40) not null,
+  NUMTEL NUMBER not null,
+  CODE_POSTAL VARCHAR2(10) not null,
+  NUMERO NUMBER,
+  RUE VARCHAR2(20),
+  PROVINCE VARCHAR2(4),
+  VILLE VARCHAR2(20));
 
 #de memoire j'avais utiliser le terme PK_USER_ID
 ALTER TABLE ishare_user ADD CONSTRAINT PK_USER_ID PRIMARY KEY(USER_ID);
