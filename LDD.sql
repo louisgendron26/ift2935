@@ -40,4 +40,12 @@ create table emprunte(
   annee_out number);
 
 ALTER TABLE emprunte ADD CONSTRAINT FK_EMPRUNT_USER_ID FOREIGN KEY (emprunt_user_id) REFERENCES ishare_user(user_id);
-ALTER TABLE emprunte ADD CONSTRAINT FK_OBJET_ID FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE emprunte ADD CONSTRAINT FK_EMPRUNT_OBJET_ID FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+
+create table interet(
+  user_id NUMBER not null,
+  objet_id NUMBER not null);
+
+ALTER TABLE interet ADD CONSTRAINT FK_INTERET_USER_ID FOREIGN KEY (USER_ID) REFERENCES ishare_user(user_id);
+ALTER TABLE interet ADD CONSTRAINT FK_INTERET_OBJET_ID FOREIGN KEY (OBJET_ID) REFERENCES objet(objet_id);
+
