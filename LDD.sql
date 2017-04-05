@@ -1,4 +1,4 @@
-set autotcommit on;
+set autocommit on;
 
 create table ishare_user (
   user_id NUMBER not null,
