@@ -22,8 +22,8 @@ create table objet (
   duree_partage NUMBER not null,
   proprietaire NUMBER not null);
 
-ALTER TABLE objet ADD CONSTRAINT pk_objet PRIMARY KEY (OBJET_ID)
-ALTER TABLE objet ADD CONSTRAINT fk_proprietaire FOREIGN KEY (PROPRIETAIRE) REFERENCES ishare_user(user_id);
+ALTER TABLE objet ADD CONSTRAINT pk_objet PRIMARY KEY (objet_id);
+ALTER TABLE objet ADD CONSTRAINT fk_proprietaire FOREIGN KEY (proprietaire) REFERENCES ishare_user(user_id);
 
 create table emprunte(
   emprunt_user NUMBER not null,
@@ -35,15 +35,15 @@ create table emprunte(
   mois_out number not null CHECK(value IN(1,12)),
   annee_out number);
 
-ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_user FOREIGN KEY (emprunt_user_id) REFERENCES ishare_user(user_id);
-ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_objet FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_user FOREIGN KEY (emprunt_user) REFERENCES ishare_user(user_id);
+ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_objet FOREIGN KEY (emprunt_objet) REFERENCES objet(objet_id);
 
 create table interet(
   interet_user NUMBER not null,
   interet_objet NUMBER not null);
 
-ALTER TABLE interet ADD CONSTRAINT fk_interet_user FOREIGN KEY (USER_ID) REFERENCES ishare_user(user_id);
-ALTER TABLE interet ADD CONSTRAINT fk_interet_objet FOREIGN KEY (OBJET_ID) REFERENCES objet(objet_id);
+ALTER TABLE interet ADD CONSTRAINT fk_interet_user FOREIGN KEY (interet_user) REFERENCES ishare_user(user_id);
+ALTER TABLE interet ADD CONSTRAINT fk_interet_objet FOREIGN KEY (interet_objet) REFERENCES objet(objet_id);
 
 create table maison(
   annee NUMBER,
