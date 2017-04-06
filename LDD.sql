@@ -152,5 +152,3 @@ INSERT INTO interet(user_id, objet_id) Values (025, 001);
 INSERT INTO interet(user_id, objet_id) Values (009, 040);
 INSERT INTO interet(user_id, objet_id) Values (017, 040);
 INSERT INTO interet(user_id, objet_id) Values (009, 002);
-
-
