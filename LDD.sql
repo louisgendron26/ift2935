@@ -29,7 +29,7 @@ ALTER TABLE ishare_user ADD CONSTRAINT pk_ishare_user PRIMARY KEY(user_id);
 create table objet(
   objet_id NUMBER not null,
   type VARCHAR2(7) not null,
-  description VARCHAR2(300),
+  description VARCHAR2(500),
   -- 0: non disponible ; 1: disponible
   disponible NUMBER(1) not null,
   -- prix par jour
@@ -44,12 +44,13 @@ ALTER TABLE objet ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES i
 create table maison(
   objet_id NUMBER not null,
   annee NUMBER,
+  -- superficie en pied carrée
   superficie NUMBER,
   etage NUMBER,
   chambre NUMBER,
   -- 0: non meublé ; 1: meublé
   meuble NUMBER(1) not null,
-  -- 0: aucun stationnement ; 1: stationnement inclu
+  -- nombre de stationnements
   stationnement NUMBER(1) not null,
   salle_bain NUMBER);
 
@@ -58,12 +59,17 @@ ALTER TABLE maison ADD CONSTRAINT fk_maison_id FOREIGN KEY (objet_id) REFERENCES
  
 create table velo(
   objet_id NUMBER not null,
+  type_velo VARCHAR2(30),
   marque VARCHAR2(30),
-  taille_cadre NUMBER,
-  vitesse NUMBER,
-  frein VARCHAR2(30),
-  taille_roue NUMBER,
-  type_velo VARCHAR2(30));
+  modele VARCHAR2(30),
+  -- matériau du cadre 
+  cadre VARCHAR2(30),
+  freins VARCHAR2(30),
+  -- taille des pneus en mesures métriques
+  taille_pneus VARCHAR2(30),
+  annee NUMBER,
+  -- 0: homme ; 1: femme ; 2: unisexe
+  sexe NUMBER);
 
 ALTER TABLE velo ADD CONSTRAINT pk_velo PRIMARY KEY(objet_id);
 ALTER TABLE velo ADD CONSTRAINT fk_velo_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
@@ -146,184 +152,187 @@ INSERT INTO ishare_user (user_id, prenom, nom, courriel, numtel, code_postal, nu
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (001, 'auto', 'Une petite Smart électrique nouvelle génération!', 1, 50, 40, 001);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (001, 'Smart', 'fortwo', 'Bleu', 2016, 0, 2, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (002, 'auto', NULL, 1, 100, 14, 004);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (002, 'auto', NULL, 1, 90, 7, 004);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (002, 'BMW', '335i', 'Blanc', 2009, 0, 2, 10);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (003, 'auto', NULL, 1, 55, 30, 007);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (003, 'auto', NULL, 1, 45, 30, 007);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (003, 'Volkswagen', 'Golf', 'Noir', 2004, 1, 4, 10);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (004, 'auto', NULL, 1, 75, 50, 010);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (004, 'auto', NULL, 1, 55, 30, 010);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (004, 'Mazda', 'MAZDA6', 'Rouge', 2015, 0, 4, 8);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (005, 'auto', NULL, 1, 90, 40, 013);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (005, 'auto', NULL, 1, 70, 14, 013);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (005, 'Jeep', 'Grand Cherokee SRT', 'Gris', 2014, 0, 4, 14);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (006, 'auto', NULL, 1, 70, 60, 016);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (006, 'auto', NULL, 1, 40, 60, 016);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (006, 'Nissan', '350Z', 'Gris', 2008, 0, 2, 11);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (007, 'auto', 'Expérience de conduite exeptionnelle garantie', 1, 40, 14, 019);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (007, 'Nissan', 'Figaro', 'Vert', 1991, 1, 2, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (008, 'auto', NULL, 1, 85, 30, 022);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (008, 'auto', NULL, 1, 55, 30, 022);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (008, 'Jeep', 'Renegade', 'Bleu', 2015, 0, 4, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (009, 'auto', 'Auto décapotable', 1, 30, 60, 025);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (009, 'auto', 'Auto décapotable', 1, 33, 60, 025);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (009, 'Volkswagen', 'Cabrio', 'Jaune', 1998, 0, 2, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (010, 'auto', NULL, 1, 55, 90, 028);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (010, 'auto', NULL, 1, 42, 90, 028);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (010, 'Volkswagen', 'Jetta', 'Noir', 2014, 0, 4, 7);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (011, 'auto', NULL, 1, 65, 60, 002);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (011, 'auto', NULL, 1, 52, 30, 002);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (011, 'Mazda', 'MAZDA5', 'Gris', 2012, 0, 4, 8);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (012, 'auto', NULL, 1, 90, 30, 005);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (012, 'auto', NULL, 1, 68, 20, 005);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (012, 'Fiat', '500X', 'Rouge', 2016, 0, 4, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (013, 'auto', NULL, 1, 95, 20, 008);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (013, 'auto', NULL, 1, 70, 14, 008);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (013, 'Fiat', '500X', 'Gris', 2016, 0, 4, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (014, 'auto', NULL, 1, 60, 50, 011);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (014, 'auto', NULL, 1, 45, 50, 011);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (014, 'Toyota', 'Matrix', 'Noir', 2013, 0, 4, 7);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (015, 'auto', NULL, 1, 40, 60, 014);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (015, 'Toyota', 'Echo', 'Bleu', 2005, 0, 2, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (016, 'auto', NULL, 1, 70, 30, 017);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (016, 'auto', NULL, 1, 58, 30, 017);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (016, 'Kia', 'Forte5', 'Blanc', 2014, 0, 4, 7);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (017, 'auto', NULL, 1, 95, 14, 020);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (017, 'auto', NULL, 1, 67, 14, 020);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (017, 'Kia', 'Forte5', 'Blanc', 2017, 0, 4, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (018, 'auto', NULL, 1, 85, 30, 023);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (018, 'auto', NULL, 1, 55, 30, 023);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (018, 'Mazda', 'MAZDA5', 'Gris', 2016, 0, 4, 9);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (019, 'auto', NULL, 1, 70, 40, 026);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (019, 'auto', NULL, 1, 45, 40, 026);
 INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) Values (019, 'Mazda', 'MAZDA5', 'Noir', 2012, 0, 4, 7);
 
 --
 -- INSERT INTO objet AND INSERT INTO velo (20 velos/60 objets) 
 --
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (020, 'velo', NULL, 1, 15, 30, 002);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (020, NULL, NULL, NULL, NULL, NULL, 'ville');
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (020, 'velo', NULL, 1, 20, 30, 002);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (020, 'Route', 'DCO', 'CRONO C', 'Aluminium', 'Étrier mécanique','700x23c', 2016, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (021, 'velo', NULL, 1, 20, 14, 005);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (021, NULL, NULL, NULL, NULL, NULL, 'ville');
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (021, 'velo', NULL, 1, 30, 30, 005);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (021, 'Route', 'Specialized', 'DOLCE', 'Aluminium', 'Étrier mécanique', NULL, 2015, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (022, 'velo', NULL, 1, prix, dureeMax, 008);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (022, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (022, 'velo', 'Les composantes Shimano Sora assemblées sur ce cadre en alliage monté sur fourche en carbone offrent une performance routière surprenante.', 1, 25, 20, 008);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (022, 'Route', 'DCO','CRONO S', 'Aluminium', 'Étrier mécanique', '700x23c', 2016, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (023, 'velo', NULL, 1, prix, dureeMax, 011);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (023, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (023, 'velo', 'Le Dolce est spécialement conçu pour vous emmener loin, physiquement et géographiquement, et dans les meilleures conditions.', 1, 30, 60, 011);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (023, 'Route', 'Specialized', 'DOLCE', 'Aluminium', 'Étrier mécanique', NULL, 2017, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (024, 'velo', NULL, 1, prix, dureeMax, 014);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (024, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (024, 'velo', NULL, 1, 40, 30, 014);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (024, 'Route', 'Specialized', 'DOLCE SPORT', 'Aluminium', 'Étrier mécanique', NULL, 2017, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (025, 'velo', NULL, 1, prix, dureeMax, 017);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (025, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (025, 'velo', NULL, 1, 20, 60, 017);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (025, 'Montagne', 'Specialized', 'MYKA V 650B', 'Aluminium', 'V-Brake', '650b', 2016, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (026, 'velo', NULL, 1, prix, dureeMax, 020);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (026, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (026, 'velo', NULL, 1, 15, 40, 020);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (026, 'Montagne', 'DCO', 'REALFAT 20"', 'Aluminium', 'Disque mécanique', NULL, 2017, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (027, 'velo', NULL, 1, prix, dureeMax, 023);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (027, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (027, 'velo', NULL, 1, 22, 90, 023);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (027, 'Montagne', 'Specialized', 'HARDROCK DISC 650B', 'Aluminium', 'Disque mécanique', '650b', 2017, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (028, 'velo', NULL, 1, prix, dureeMax, 026);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (028, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (028, 'velo', 'Classe, raffinement et bien sûr légèreté, le vélo Élégance 701 est le vélo hybride confort par excellence.', 1, 15, 90, 026);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (028, 'Urbain', 'DCO', 'ELEGANCE 701', 'Aluminium', 'V-Brake', NULL, 2016, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (029, 'velo', NULL, 1, prix, dureeMax, 029);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (029, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (029, 'velo', NULL, 1, 20, 60, 029);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (029, 'Urbain', 'Specialized', 'SIRRUS', 'Aluminium', 'V-Brake', '700x32c', 2016, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (030, 'velo', NULL, 1, prix, dureeMax, 003);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (030, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (030, 'velo', 'Le VFR est un vélo confortable destiné au cycliste en bonne forme qui désire se rendre à destination rapidement.', 1, 22, 20, 003);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (030, 'Urbain', 'Norco', 'VFR 6','Aluminium', 'V-Brake', '700c', 2017, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (031, 'velo', NULL, 1, prix, dureeMax, 006);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (031, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (031, 'velo', 'Vélo à une vitesse.', 1, 16, 120, 006);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (031, 'Urbain', 'Damco', NULL, 'Acier', NULL, '700', NULL, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (032, 'velo', NULL, 1, prix, dureeMax, 009);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (032, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (032, 'velo', NULL, 1, 10, 120, 009);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (032, 'Route', 'Marinoni', NULL, 'Carbone', NULL, NULL, NULL, NULL);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (033, 'velo', NULL, 1, prix, dureeMax, 012);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (033, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (033, 'velo', 'Vélo de triathlon en excellente condition.', 1, 40, 14, 012);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (033, 'Route', 'Dedacciai', 'Strada Chrono', 'Carbone', NULL, NULL, 2013, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (034, 'velo', NULL, 1, prix, dureeMax, 015);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (034, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (034, 'velo', NULL, 1, 40, 20, 015);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (034, 'Route', 'Specialized', 'SHIV ELITE 105', 'Carbone', 'Étrier mécanique', NULL, 2016, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (035, 'velo', NULL, 1, prix, dureeMax, 018);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (035, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (035, 'velo', NULL, 1, 12, 120, 018);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (035, 'Route', 'Free spirit', NULL, NULL, NULL, NULL, 2013, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (036, 'velo', NULL, 1, prix, dureeMax, 021);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (036, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (036, 'velo', NULL, 1, 15, 60, 021);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (036, 'Route', 'Louis Garneau', 'AXIS 1-0', NULL, NULL, NULL, 2014, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (037, 'velo', NULL, 1, prix, dureeMax, 024);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (037, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (037, 'velo', 'Vélo Urbain Fixie SingleSpeed cadre Large 20" en excellente condition.', 1, 22, 50, 024);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (037, 'Urbain', NULL, NULL, NULL, 'V-Brake', NULL, 2014, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (038, 'velo', NULL, 1, prix, dureeMax, 027);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (038, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (038, 'velo', NULL, 1, 10, 120, 027);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (038, 'Urbain', 'Louis Garneau', NULL, NULL, NULL, NULL, 2012, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (039, 'velo', NULL, 1, prix, dureeMax, 030);
-INSERT INTO velo (objet_id, marque, taille_cadre, vitesse, frein, taille_roue, type_velo) Values (039, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (039, 'velo', 'Velo de stype BMX, parfait pour les sauts de terre ou le street riding.', 1, 20, 30, 030);
+INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) Values (039, 'BMX', 'DCO', 'PHANTOM', 'Acier', 'U-Brake', NULL, 2015, 2);
 
 --
 -- INSERT INTO objet AND INSERT INTO maison (20 maisons/60 objets) 
 --
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (040, 'maison', NULL, 1, , 30, 003);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (040, 1995, NULL, 2, 3, 2, 1, 1);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (040, 'maison', NULL, 1, 40, 60, 003);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (040, 1995, 2000, 2, 3, 2, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (041, 'maison', NULL, 1, 1000, 30, 006);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (041, 2000, NULL, 1, 2, 1, 1, 1);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (041, 'maison', NULL, 1, 35, 30, 006);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (041, 2010, 1100, 1, 2, 1, 1, 2);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (042, 'maison', 'chaleureuse maison à louer', 1, 150, 7, 009)
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (042, NULL, NULL, 3, 3, 2, 1, 1);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (042, 'maison', 'chaleureuse maison à louer', 1, 70, 7, 009);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (042, NULL, 3200, 3, 3, 2, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (043, 'maison',NULL, 1, prix, dureeMax, 012);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (043, 'maison',NULL, 1, 35, 120, 012);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (043, NULL, NULL, 3, 4, 3, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (044, 'maison',NULL, 1, prix, dureeMax, 015);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (044, 'maison',NULL, 1, 45, 60, 015);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (044, NULL, NULL, 1, 2, 1, 1, 0);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (045, 'maison',NULL, 1, 30, 365, 018);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (045, NULL, NULL, 2, 3, 1, 0, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (046, 'maison', NULL, 1, prix, dureeMax, 021);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (046, 'maison', NULL, 1, 50, 14, 021);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (046, NULL, NULL, 3, 2, 2, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (047, 'maison', NULL, 1, prix, dureeMax, 024);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (047, 'maison', NULL, 1, 45, 14, 024);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (047, NULL, NULL, 3, 3, 3, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (048, 'maison',NULL, 1, prix, dureeMax, 027);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (048, 'maison',NULL, 1, 35, 60, 027);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (048, NULL, NULL, 1, 2, 1, 0, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (049, 'maison',NULL, 1, prix, dureeMax, 030);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (049, 'maison',NULL, 1, 30, 120, 030);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (049, NULL, NULL, 1, 1, 1, 0, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (050, 'maison',NULL, 1, prix, dureeMax, 001);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (050, 'maison',NULL, 1, 60, 7, 001);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (050, NULL, NULL, 4, 4, 3, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (051, 'maison',NULL, 1, prix, dureeMax, 004);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (051, 'maison',NULL, 1, 70, 7, 004);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (051, NULL, NULL, 3, 2, 3, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (052, 'maison',NULL, 1, prix, dureeMax, 007);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (052, 'maison',NULL, 1, 42, 30, 007);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (052, NULL, NULL, 2, 2, 1, 1, 0);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (053, 'maison',NULL, 1, prix, dureeMax, 010);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (053, 'maison',NULL, 1, 45, 20, 010);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (053, NULL, NULL, 2, 2, 1, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (054, 'maison',NULL, 1, prix, dureeMax, 013);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (054, 'maison',NULL, 1, 62, 14, 013);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (054, NULL, NULL, 4, 5, 4, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (055, 'maison',NULL, 1, prix, dureeMax, 016);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (055, 'maison',NULL, 1, 42, 60, 016);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (055, NULL, NULL, 1, 3, 1, 0, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (056, 'maison',NULL, 1, prix, dureeMax, 019);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (057, NULL, NULL, 1, 4, 2, 1, 1);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (056, 'maison',NULL, 1, 38, 120, 019);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (056, NULL, NULL, 1, 4, 2, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (058, 'maison',NULL, 1, prix, dureeMax, 022);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (057, 'maison',NULL, 1, 42, 60, 019);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (057, NULL, NULL, 2, 4, 2, 1, 1);
+
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (058, 'maison',NULL, 1, 55, 14, 022);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (058, NULL, NULL, 3, 4, 3, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (059, 'maison',NULL, 1, prix, dureeMax, 025);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (059, 'maison',NULL, 1, 70, 7, 025);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (059, NULL, NULL, 4, 5, 4, 1, 1);
 
-INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (060, 'maison',NULL, 1, prix, dureeMax, 028);
+INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (060, 'maison',NULL, 1, 48, 20, 028);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (060, NULL, NULL, 2, 4, 2, 1, 0);
 
 
@@ -336,5 +345,4 @@ INSERT INTO interet(user_id, objet_id) Values (025, 001);
 INSERT INTO interet(user_id, objet_id) Values (009, 040);
 INSERT INTO interet(user_id, objet_id) Values (017, 040);
 INSERT INTO interet(user_id, objet_id) Values (009, 002);
-
 
