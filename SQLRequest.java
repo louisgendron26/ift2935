@@ -1,23 +1,37 @@
-import Connection;
+package ishare;
+
 import java.sql.*;
 import java.util.*;
 
 public class SQLRequest {
-
-    public static ResultSet request(query) {
-        Connection con = connection();
-        Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-        return rs;
+    public static ResultSet request(String query){
+	try{
+        	Connection con = JavaConnect.connection();
+        	Statement stmt = con.createStatement();
+        	ResultSet rs = stmt.executeQuery(query);
+		return rs;
+	}catch (SQLException se){
+		se.printStackTrace();
+	}catch (Exception e){
+		e.printStackTrace();
+	}
+	
+        return null;
     }
 
-    public static String[] searchType(String type){
-        result = request("SELECT * FROM objet WHERE type == " + type);
-        List<String> list= new ArrayList<>();
-        while (result.next()){
-            list.add(result.getInt("objet_id "))
-        }
-        return list;
+    public static List<Integer> searchType(String type){
+        ResultSet result = request("SELECT objet_id FROM objet WHERE type = \'" + type+"\'");
+        List<Integer> list= new ArrayList<>();
+        try{
+		while (result.next()){
+            		list.add(result.getInt(1));}
+		return list;
+	}catch (SQLException se){
+		se.printStackTrace();
+        }catch (Exception e){
+		e.printStackTrace();
+	}
+        return null;
     }
 
     public static String[][] searchObjectByDisponibility(){
