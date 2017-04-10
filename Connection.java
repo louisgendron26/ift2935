@@ -1,9 +1,10 @@
 import java.sql.*;
-
+import SQLRequest.java
 public class JavaConnect {
     public static void main(String[] args) {
         System.out.println("Test");
-        request();
+        x = searchType('velo');
+        System.out.println(x);
     }
 
 
