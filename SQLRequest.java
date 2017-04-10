@@ -107,12 +107,18 @@ public class SQLRequest {
     }
 
     public static String[][] findObjectBorrowerByDate(/*TODO*/){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
+	ResultSet result = request("SELECT objet_id FROM objet WHERE type = \'" + type+"\'");
+        List<Integer> list= new ArrayList<>();
+        try{
+		while (result.next()){
+            		list.add(result.getInt(1));}
+		return list;
+	}catch (SQLException se){
+		se.printStackTrace();
+        }catch (Exception e){
+		e.printStackTrace();
+	}
+        return null;
     }
 
     public static String[][] InterrsestedUsers(/*TODO*/){
