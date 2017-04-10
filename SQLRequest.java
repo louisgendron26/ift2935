@@ -1,11 +1,16 @@
+import java.sql.*
 
 public class SQLRequest {
-	
-	public static String[][] searchType(/*TODO*/){
+	public static ResultSet request(query) {
+        	Connection con = connection();
+        	Statement stmt = con.createStatement();
+       		ResultSet rs = stmt.executeQuery(query);
+        	return rs;
+	}
+	public static String[][] searchType(String a_type){
 		String tab[][]= new String [0][0];
-		//TODO  
-		
-		
+		my_request = "SELECT * FROM objet WHERE type = '" + a_type +"'";
+		tab = request(my_request);
 		
 		return tab;
 	}
@@ -13,13 +18,13 @@ public class SQLRequest {
 	public static String[][] searchObjectByDisponibility(/*TODO*/){
 		String tab[][]= new String [0][0];
 		//TODO  
-		
+		my_request = "SELECT * FROM objet WHERE disponible = '1'"
 		
 		
 		return tab;
 	}
 	
-	public static String[][] searchObjectByPrice(/*TODO*/){
+	public static String[][] searchObjectByPrice(int x, int y){
 		String tab[][]= new String [0][0];
 		//TODO  
 		
