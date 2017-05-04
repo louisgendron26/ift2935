@@ -39,6 +39,7 @@ public class SQLRequest {
 
     }
 
+
     public static List<Integer> searchObjectByDisponibility(){
         try{
             ResultSet result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
@@ -99,13 +100,39 @@ public class SQLRequest {
         }
 
     }
+    
+
+    public static void createUser(String prenom, String nom, String courriel, int numtel, String code_postal, int numero, String rue, String province, String ville){
+	try{
+	    ResultSet result = request("SELECT COUNT(user_id) AS total FROM ishare_user");
+            List<Integer> list = new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("total"));
+            }
+
+	    int next_id = (int)list.get(0) + 1;
+	    System.out.println(next_id);
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+
+	    stmt.executeUpdate("INSERT INTO ishare_user (user_id, prenom, nom, courriel, numtel, code_postal, numero, rue, province, ville) VALUES ("+next_id+ ",\'" +prenom+ "\',\'" +nom+ "\',\'" +courriel+ "\'," + numtel + ",\'" + code_postal +"\',"+numero+",\'"+rue+"\',\'"+province+"\',\'"+ville+"\')");
+
+	}catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+		
+    }
 
     public static void changeObjectDisponibility(int objet_id){
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
             ResultSet result = request("SELECT disponible FROM objet WHERE objet_id = "+objet_id);
-            if (result.getInt("disponible") == 1){
+	    result.next();
+	    if (result.getInt("disponible") == 1){
                 stmt.executeUpdate("UPDATE objet SET disponible = 0");
             }else{
                 stmt.executeUpdate("UPDATE objet SET disponible = 1");
@@ -180,6 +207,22 @@ public class SQLRequest {
 
         String tab[][]= new String [0][0];
         //TODO
+
+    public static List<String> getObjetInfo(int objet_id){
+
+    try{
+            ResultSet result = request("SELECT type FROM (SELECT * FROM objet WHERE objet_id ="+objet_id+")");
+            List<String> list= new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt(""));
+            }
+            return list;
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
 
 
 
