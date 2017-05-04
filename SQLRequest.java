@@ -2,6 +2,8 @@ package ishare;
 
 import java.sql.*;
 import java.util.*;
+import java.net.*;
+import org.json.*;
 
 public class SQLRequest {
 
@@ -26,7 +28,7 @@ public class SQLRequest {
             ResultSet result = request("SELECT objet_id FROM objet WHERE type = \'" + type+"\'");
             List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
             return list;
         }catch (SQLException se){
@@ -39,12 +41,13 @@ public class SQLRequest {
 
     }
 
+
     public static List<Integer> searchObjectByDisponibility(){
         try{
-            result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
             return list;
         }catch (SQLException se){
@@ -57,10 +60,10 @@ public class SQLRequest {
 
     public static List<Integer> searchObjectByPrice(int lower_price, int higer_price){
         try{
-            result = request("SELECT objet_id FROM objet WHERE (prix BETWEEN "+lower_price+" AND "+higer_price+")");
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT objet_id FROM objet WHERE (prix BETWEEN "+lower_price+" AND "+higer_price+")");
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
             return list;
         }catch (SQLException se){
@@ -71,23 +74,86 @@ public class SQLRequest {
         return null;
     }
 
-    public static String[][] searchObjectByProximity(){
-        String tab[][]= new String [0][0];
-        //TODO
+
+
+    public static String getObjectLocation(int objet_id){
+        try{
+            ResultSet result = request("SELECT b.code_postal FROM objet a ishare_user b WHERE (a.owner_id = b.user_id) AND a.objet_id = " + objet_id );
+            result.next();
+            String code_postal = result.getString("code_postal");
+            return code_postal;
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
 
 
 
-        return tab;
     }
 
-    public static void createObject(int objet_id, String type, String description, boolean disponible, int prix, int duree_partage, int owner_id){
+    public static List<Integer> searchObjectByProximity(int distance, int user_id){
+        try{
+            ResultSet result = request("SELECT b.code_postal FROM ishare_user user_id = " + user_id );
+            result.next();
+            String user_postcode = result.getString("code_postal");
+            List<Integer> list = new ArrayList<>;
+            ResultSet object_result =  request("SELECT objet_id FROM objet ");
+            while (result.next()){
+
+                String object_postcode = getObjectLocation(object_result.getInt("objet_id"));
+
+                try {
+                    JSONParser parser = new JSONParser();
+                    URL myURL =  new URL("http://maps.googleapis.com/maps/api/distancematrix/json?origins="+ user_postcode +",canada&destinations="+ object_postcode +",canada&mode=driving&language=en-EN&sensor=false");
+                    URLConnection myURLConnection = myURL.openConnection();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(myURLConnection.getInputStream()));
+                    String inputLine = in.readLine());
+                    System.out.println(inputLine);
+                    Pattern pattern = Pattern.compile("\d*.?\d* km");
+                    Matcher matcher = pattern.matcher(inputLine);
+                    int distance_trouver;
+                    if (matcher.find()){
+                        Pattern pattern2 = Pattern.compile("\d*.?\d*");
+                        Matcher matcher2 = pattern2.matcher(matcher.group(1));
+                        if (matcher2.find()){
+                            distance_trouver = matcher2.group(1);
+                        }
+                    }
+
+                    if (Integer.parseInt(distance_trouver) < distance){
+                        list.add(object_result.getInt("objet_id"));
+                    }
+                    in.close();
+                }
+                catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                URLConnection myURLConnection = myURL.openConnection();
+
+            }
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+
+
+    }
+
+    public static void createObject(String type, String description, boolean disponible, int prix, int duree_partage, int owner_id){
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values ("+
-                                                        objet_id+", "+
-                                                        type+", "+
-                                                        description+", "+
+                                                        objet_id+", \'"+
+                                                        type+"\', \'"+
+                                                        description+"\', "+
                                                         disponible+", "+
                                                         prix+", "+
                                                         duree_partage+", "+
@@ -100,12 +166,37 @@ public class SQLRequest {
 
     }
 
+    public static void createUser(String prenom, String nom, String courriel, int numtel, String code_postal, int numero, String rue, String province, String ville){
+        try{
+            ResultSet result = request("SELECT COUNT(user_id) AS total FROM ishare_user");
+            List<Integer> list = new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("total"));
+            }
+
+            int next_id = (int)list.get(0) + 1;
+            System.out.println(next_id);
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+
+            stmt.executeUpdate("INSERT INTO ishare_user (user_id, prenom, nom, courriel, numtel, code_postal, numero, rue, province, ville) VALUES ("+next_id+ ",\'" +prenom+ "\',\'" +nom+ "\',\'" +courriel+ "\'," + numtel + ",\'" + code_postal +"\',"+numero+",\'"+rue+"\',\'"+province+"\',\'"+ville+"\')");
+
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+
     public static void changeObjectDisponibility(int objet_id){
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
-            result = request("SELECT disponible FROM object WHERE object_id = \'"+objet_id+"\'");
-            if result.getInt(1){
+            ResultSet result = request("SELECT disponible FROM objet WHERE objet_id = "+objet_id);
+            result.next();
+            if (result.getInt("disponible") == 1){
                 stmt.executeUpdate("UPDATE objet SET disponible = 0");
             }else{
                 stmt.executeUpdate("UPDATE objet SET disponible = 1");
@@ -121,7 +212,7 @@ public class SQLRequest {
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
-            stmt.executeUpdate("UPDATE objet SET price = \'"+ price +"\' WHERE object_id = \'"+object_id+"\'");
+            stmt.executeUpdate("UPDATE objet SET prix = \'"+ price +"\' WHERE objet_id = \'"+object_id+"\'");
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
@@ -142,21 +233,45 @@ public class SQLRequest {
         }
     }
 
-    public static String[][] findObjectBorrowerByDate(Date date){
-        String tab[][]= new String [0][0];
-        //TODO
+    public static List<Integer> findObjectBorrowerByDate(int obj_id, String date){
+        try{
+            ResultSet result = request("SELECT user_id FROM emprunte WHERE objet_id = "+ obj_id + " AND date_in <= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\') AND date_out >= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\')");
+            List<Integer> list= new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("user_id"));
+            }
+            return list;
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
 
-
-
-        return tab;
     }
 
     public static List<Integer> InterrsestedUsers(int objet_id){
         try{
-            result = request("SELECT * FROM interet WHERE objet_id = \'" + objet_id+"\'");
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT * FROM interet WHERE objet_id = " + objet_id);
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("user_id"))
+                list.add(result.getInt("user_id"));
+            }
+            return list;
+        } catch (SQLException se){
+            se.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<Integer> interrsestedUsers(int objet_id){
+        try{
+            ResultSet result = request("SELECT * FROM interet WHERE objet_id = " + objet_id);
+            List<Integer> list= new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("user_id"));
             }
             return list;
         }catch (SQLException se){
@@ -167,13 +282,17 @@ public class SQLRequest {
         return null;
     }
 
-    public static List<String> UsersTypeInterest(int user_id){
+    public static List<String> getObjectInfo(int objet_id){
         try{
-            result = request("SELECT type FROM objet WHERE objet_id = \'(SELECT objet_id FROM interet WHERE = \'" + user_id +"\')\'");
+            ResultSet result = request("SELECT * FROM objet WHERE objet_id = " + user_id);
             List<String> list= new ArrayList<>();
-            while (result.next()){
-                list.add(result.getString("type"))
-            }
+
+            result.next()
+            list.add(result.getString("type"));
+            list.add(result.getString("disponible"));
+            list.add(result.getString("prix"));
+            list.add(result.getString("dureeMax"));
+
             return list;
         }catch (SQLException se){
             se.printStackTrace();
@@ -182,55 +301,61 @@ public class SQLRequest {
         }
         return null;
     }
+
+
 
     public static List<String> getUserInfo(int user_id){
-        Courriel;
-        Nom;
-        Prenom;
-
-
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
-    }
-
-    public static Map<String, String> getObject(int object_id){
         try{
-            result = request("SELECT * FROM objet WHERE objet_id = \'" + object_id +"\')\'");
+            ResultSet result = request("SELECT * FROM ishare_user WHERE user_id = " + user_id);
+            List<String> list= new ArrayList<>();
 
+            result.next()
+            list.add(result.getString("prenom"));
+            list.add(result.getString("nom"));
+            list.add(result.getString("courriel"));
+            list.add(result.getString("numtel"));
+            list.add(result.getString("code_postal"));
+            list.add(result.getString("numero"));
+            list.add(result.getString("rue"));
+            list.add(result.getString("province"));
+            list.add(result.getString("ville"));
 
+            return list;
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
-
-
-
-
-        return tab;
     }
 
-    public static String[][] BeginShare(/*TODO*/){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
+    public static void BeginShare(int user_id, int object_id, int duree){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            DateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+            Date date = new Date();
+            stmt.executeUpdate("INSERT INTO emprunte(user_id, objet_id, duree, date_in, date_out) Values (" + user_id + ", " + object_id + ", " + duree + ", TO_DATE(' "+ date +"', 'DD/MM/YYYY'), NULL); ");
+            changeObjectDisponibility(object_id)
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public static String[][] EndShare(/*TODO*/){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
+    public static void EndShare(int user_id, int object_id){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            DateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+            Date date = new Date();
+            stmt.executeUpdate("UPDATE emprunt SET date_out = TO_DATE(' "+ date +"' WHERE user_id = " + user_id + " AND objet_id = " + object_id);
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }
