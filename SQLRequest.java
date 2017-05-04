@@ -26,7 +26,7 @@ public class SQLRequest {
             ResultSet result = request("SELECT objet_id FROM objet WHERE type = \'" + type+"\'");
             List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
             return list;
         }catch (SQLException se){
@@ -41,12 +41,12 @@ public class SQLRequest {
 
     public static List<Integer> searchObjectByDisponibility(){
         try{
-            result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
-            return list;
+           return list;
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
@@ -57,10 +57,10 @@ public class SQLRequest {
 
     public static List<Integer> searchObjectByPrice(int lower_price, int higer_price){
         try{
-            result = request("SELECT objet_id FROM objet WHERE (prix BETWEEN "+lower_price+" AND "+higer_price+")");
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT objet_id FROM objet WHERE (prix BETWEEN "+lower_price+" AND "+higer_price+")");
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("objet_id"))
+                list.add(result.getInt("objet_id"));
             }
             return list;
         }catch (SQLException se){
@@ -85,13 +85,13 @@ public class SQLRequest {
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
             stmt.executeUpdate("INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values ("+
-                                                        objet_id+", "+
-                                                        type+", "+
-                                                        description+", "+
+                                                        objet_id+", \'"+
+                                                        type+"\', \'"+
+                                                        description+"\', "+
                                                         disponible+", "+
                                                         prix+", "+
                                                         duree_partage+", "+
-                                                        owner_id");");
+                                                        owner_id+")");
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
@@ -104,8 +104,8 @@ public class SQLRequest {
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
-            result = request("SELECT disponible FROM object WHERE object_id = \'"+objet_id+"\'");
-            if result.getInt(1){
+            ResultSet result = request("SELECT disponible FROM objet WHERE objet_id = "+objet_id);
+            if (result.getInt("disponible") == 1){
                 stmt.executeUpdate("UPDATE objet SET disponible = 0");
             }else{
                 stmt.executeUpdate("UPDATE objet SET disponible = 1");
@@ -121,7 +121,7 @@ public class SQLRequest {
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
-            stmt.executeUpdate("UPDATE objet SET price = \'"+ price +"\' WHERE object_id = \'"+object_id+"\'");
+            stmt.executeUpdate("UPDATE objet SET prix = \'"+ price +"\' WHERE objet_id = \'"+object_id+"\'");
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
@@ -142,21 +142,29 @@ public class SQLRequest {
         }
     }
 
-    public static String[][] findObjectBorrowerByDate(Date date){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
+    public static List<Integer> findObjectBorrowerByDate(int obj_id, String date){
+	try{
+            ResultSet result = request("SELECT user_id FROM emprunte WHERE objet_id = "+ obj_id + " AND date_in <= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\') AND date_out >= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\')");
+            List<Integer> list= new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("user_id"));
+            }
+            return list;
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+        
     }
 
-    public static List<Integer> InterrsestedUsers(int objet_id){
+    public static List<Integer> interrsestedUsers(int objet_id){
         try{
-            result = request("SELECT * FROM interet WHERE objet_id = \'" + objet_id+"\'");
-            List<String> list= new ArrayList<>();
+            ResultSet result = request("SELECT * FROM interet WHERE objet_id = " + objet_id);
+            List<Integer> list= new ArrayList<>();
             while (result.next()){
-                list.add(result.getInt("user_id"))
+                list.add(result.getInt("user_id"));
             }
             return list;
         }catch (SQLException se){
@@ -167,26 +175,7 @@ public class SQLRequest {
         return null;
     }
 
-    public static List<String> UsersTypeInterest(int user_id){
-        try{
-            result = request("SELECT type FROM objet WHERE objet_id = \'(SELECT objet_id FROM interet WHERE = \'" + user_id +"\')\'");
-            List<String> list= new ArrayList<>();
-            while (result.next()){
-                list.add(result.getString("type"))
-            }
-            return list;
-        }catch (SQLException se){
-            se.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static List<String> getUserInfo(int user_id){
-        Courriel;
-        Nom;
-        Prenom;
+    public static void getUserInfo(int user_id){
 
 
         String tab[][]= new String [0][0];
@@ -194,43 +183,13 @@ public class SQLRequest {
 
 
 
-        return tab;
     }
 
-    public static Map<String, String> getObject(int object_id){
-        try{
-            result = request("SELECT * FROM objet WHERE objet_id = \'" + object_id +"\')\'");
-
-
-        }catch (SQLException se){
-            se.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-
-
-
-
-        return tab;
+    public static void BeginShare(/*TODO*/){
+       
     }
 
-    public static String[][] BeginShare(/*TODO*/){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
+    public static void EndShare(/*TODO*/){
+        
     }
-
-    public static String[][] EndShare(/*TODO*/){
-        String tab[][]= new String [0][0];
-        //TODO
-
-
-
-        return tab;
-    }
-
 }
