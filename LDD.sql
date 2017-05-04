@@ -39,7 +39,7 @@ create table objet(
   owner_id NUMBER not null);
 
 ALTER TABLE objet ADD CONSTRAINT pk_objet PRIMARY KEY (objet_id);
-ALTER TABLE objet ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES ishare_user(user_id);
+ALTER TABLE objet ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES ishare_user(user_id) ON DELETE CASCADE;
 
 create table maison(
   objet_id NUMBER not null,
@@ -55,7 +55,7 @@ create table maison(
   salle_bain NUMBER);
 
 ALTER TABLE maison ADD CONSTRAINT pk_maison PRIMARY KEY(objet_id);
-ALTER TABLE maison ADD CONSTRAINT fk_maison_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE maison ADD CONSTRAINT fk_maison_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id) ON DELETE CASCADE;
  
 create table velo(
   objet_id NUMBER not null,
@@ -72,7 +72,7 @@ create table velo(
   sexe NUMBER);
 
 ALTER TABLE velo ADD CONSTRAINT pk_velo PRIMARY KEY(objet_id);
-ALTER TABLE velo ADD CONSTRAINT fk_velo_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE velo ADD CONSTRAINT fk_velo_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id) ON DELETE CASCADE;
  
 create table auto(
   objet_id NUMBER not null,
@@ -87,7 +87,7 @@ create table auto(
   consommation NUMBER);
 
 ALTER TABLE auto ADD CONSTRAINT pk_auto PRIMARY KEY(objet_id);
-ALTER TABLE auto ADD CONSTRAINT fk_auto_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE auto ADD CONSTRAINT fk_auto_id FOREIGN KEY (objet_id) REFERENCES objet(objet_id) ON DELETE CASCADE;
 
 create table emprunte(
   user_id NUMBER not null,
@@ -99,16 +99,16 @@ create table emprunte(
   date_out DATE);
 
 ALTER TABLE emprunte ADD CONSTRAINT pk_emprunt PRIMARY KEY(user_id, objet_id);
-ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_user FOREIGN KEY (user_id) REFERENCES ishare_user(user_id);
-ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_objet FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_user FOREIGN KEY (user_id) REFERENCES ishare_user(user_id) ON DELETE CASCADE;
+ALTER TABLE emprunte ADD CONSTRAINT fk_emprunt_objet FOREIGN KEY (objet_id) REFERENCES objet(objet_id) ON DELETE CASCADE;
 
 create table interet(
   user_id NUMBER not null,
   objet_id NUMBER not null);
 
 ALTER TABLE interet ADD CONSTRAINT pk_interet PRIMARY KEY(user_id, objet_id);
-ALTER TABLE interet ADD CONSTRAINT fk_interet_user FOREIGN KEY (user_id) REFERENCES ishare_user(user_id);
-ALTER TABLE interet ADD CONSTRAINT fk_interet_objet FOREIGN KEY (objet_id) REFERENCES objet(objet_id);
+ALTER TABLE interet ADD CONSTRAINT fk_interet_user FOREIGN KEY (user_id) REFERENCES ishare_user(user_id) ON DELETE CASCADE;
+ALTER TABLE interet ADD CONSTRAINT fk_interet_objet FOREIGN KEY (objet_id) REFERENCES objet(objet_id) ON DELETE CASCADE;
 
 -- FIN CREATE TABLE
 
@@ -282,58 +282,58 @@ INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owne
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (042, NULL, 3200, 3, 3, 2, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (043, 'maison',NULL, 1, 35, 120, 012);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (043, NULL, NULL, 3, 4, 3, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (043, NULL, 3000, 3, 4, 3, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (044, 'maison',NULL, 1, 45, 60, 015);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (044, NULL, NULL, 1, 2, 1, 1, 0);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (044, NULL, 1000, 1, 2, 1, 1, 0);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (045, 'maison',NULL, 1, 30, 365, 018);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (045, NULL, NULL, 2, 3, 1, 0, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (045, NULL, 1500, 2, 3, 1, 0, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (046, 'maison', NULL, 1, 50, 14, 021);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (046, NULL, NULL, 3, 2, 2, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (046, NULL, 3300, 3, 2, 2, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (047, 'maison', NULL, 1, 45, 14, 024);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (047, NULL, NULL, 3, 3, 3, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (047, NULL, 3500, 3, 3, 3, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (048, 'maison',NULL, 1, 35, 60, 027);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (048, NULL, NULL, 1, 2, 1, 0, 0);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (048, NULL, 1200, 1, 2, 1, 0, 0);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (049, 'maison',NULL, 1, 30, 120, 030);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (049, NULL, NULL, 1, 1, 1, 0, 0);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (049, NULL, 1100, 1, 1, 1, 0, 0);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (050, 'maison',NULL, 1, 60, 7, 001);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (050, NULL, NULL, 4, 4, 3, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (050, NULL, 4100, 4, 4, 3, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (051, 'maison',NULL, 1, 70, 7, 004);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (051, NULL, NULL, 3, 2, 3, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (051, NULL, 3100, 3, 2, 3, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (052, 'maison',NULL, 1, 42, 30, 007);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (052, NULL, NULL, 2, 2, 1, 1, 0);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (052, NULL, 2200, 2, 2, 1, 1, 0);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (053, 'maison',NULL, 1, 45, 20, 010);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (053, NULL, NULL, 2, 2, 1, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (053, NULL, 2500, 2, 2, 1, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (054, 'maison',NULL, 1, 62, 14, 013);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (054, NULL, NULL, 4, 5, 4, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (054, NULL, 3700, 4, 5, 4, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (055, 'maison',NULL, 1, 42, 60, 016);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (055, NULL, NULL, 1, 3, 1, 0, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (055, NULL, 1000, 1, 3, 1, 0, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (056, 'maison',NULL, 1, 38, 120, 019);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (056, NULL, NULL, 1, 4, 2, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (056, NULL, 1200, 1, 4, 2, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (057, 'maison',NULL, 1, 42, 60, 019);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (057, NULL, NULL, 2, 4, 2, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (057, NULL, 1750, 2, 4, 2, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (058, 'maison',NULL, 1, 55, 14, 022);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (058, NULL, NULL, 3, 4, 3, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (058, NULL, 2700, 3, 4, 3, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (059, 'maison',NULL, 1, 70, 7, 025);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (059, NULL, NULL, 4, 5, 4, 1, 1);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (059, NULL, 4500, 4, 5, 4, 1, 1);
 
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (060, 'maison',NULL, 1, 48, 20, 028);
-INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (060, NULL, NULL, 2, 4, 2, 1, 0);
+INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (060, NULL, 2000, 2, 4, 2, 1, 0);
 
 
 
@@ -345,4 +345,3 @@ INSERT INTO interet(user_id, objet_id) Values (025, 001);
 INSERT INTO interet(user_id, objet_id) Values (009, 040);
 INSERT INTO interet(user_id, objet_id) Values (017, 040);
 INSERT INTO interet(user_id, objet_id) Values (009, 002);
-
