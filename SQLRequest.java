@@ -79,7 +79,24 @@ public class SQLRequest {
         return null;
     }
 
-
+    public static void addTypeInfo(int objet_id, String type, List<String> type_info){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            if (type.equals("maison")){
+                stmt.executeUpdate("INSERT INTO maison (objet_id, annee, superficie, etage, chambre, meuble, stationnement, salle_bain) VALUES ("+objet_id+ "," +type_info.get(0)+ "," +type_info.get(1)+ ","+type_info.get(2)+ "," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+","+type_info.get(7)+","+type_info.get(8)+")");
+            } else if (type.equals("auto")) {
+                stmt.executeUpdate("INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) VALUES ("+objet_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\'," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+")");
+            } else if (type.equals("velo")) {
+                stmt.executeUpdate("INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) VALUES ("+objet_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\',\'" +type_info.get(3)+ "\',\'" +type_info.get(4)+"\',\'"+type_info.get(5)+"\',"+type_info.get(6)+","+type_info.get(7)+")");
+            }
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        
+    }
 
     public static String getObjectLocation(int objet_id){
         try{
@@ -235,21 +252,7 @@ public class SQLRequest {
 
     }
 
-    public static List<Integer> InterrsestedUsers(int objet_id){
-        try{
-            ResultSet result = request("SELECT * FROM interet WHERE objet_id = " + objet_id);
-            List<Integer> list= new ArrayList<>();
-            while (result.next()){
-                list.add(result.getInt("user_id"));
-            }
-            return list;
-        } catch (SQLException se){
-            se.printStackTrace();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
+    
 
     public static List<Integer> interrsestedUsers(int objet_id){
         try{
