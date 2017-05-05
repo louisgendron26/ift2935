@@ -79,25 +79,6 @@ public class SQLRequest {
         return null;
     }
 
-    public static void addTypeInfo(int objet_id, String type, List<String> type_info){
-        try{
-            Connection con = JavaConnect.connection();
-            Statement stmt = con.createStatement();
-            if (type.equals("maison")){
-                stmt.executeUpdate("INSERT INTO maison (objet_id, annee, superficie, etage, chambre, meuble, stationnement, salle_bain) VALUES ("+objet_id+ "," +type_info.get(0)+ "," +type_info.get(1)+ ","+type_info.get(2)+ "," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+","+type_info.get(7)+","+type_info.get(8)+")");
-            } else if (type.equals("auto")) {
-                stmt.executeUpdate("INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) VALUES ("+objet_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\'," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+")");
-            } else if (type.equals("velo")) {
-                stmt.executeUpdate("INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) VALUES ("+objet_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\',\'" +type_info.get(3)+ "\',\'" +type_info.get(4)+"\',\'"+type_info.get(5)+"\',"+type_info.get(6)+","+type_info.get(7)+")");
-            }
-        }catch (SQLException se){
-            se.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        
-    }
-
     public static String getObjectLocation(int objet_id){
         try{
             ResultSet result = request("SELECT b.code_postal FROM objet a ishare_user b WHERE (a.owner_id = b.user_id) AND a.objet_id = " + objet_id );
@@ -110,9 +91,6 @@ public class SQLRequest {
             e.printStackTrace();
         }
         return null;
-
-
-
     }
 
     public static List<Integer> searchObjectByProximity(int distance, int user_id){
@@ -122,10 +100,9 @@ public class SQLRequest {
             String user_postcode = result.getString("code_postal");
             List<Integer> list = new ArrayList<>();
             ResultSet object_result =  request("SELECT objet_id FROM objet ");
+            
             while (result.next()){
-
                 String object_postcode = getObjectLocation(object_result.getInt("objet_id"));
-
                 try {
                     URL myURL =  new URL("http://maps.googleapis.com/maps/api/distancematrix/json?origins="+ user_postcode +",canada&destinations="+ object_postcode +",canada&mode=driving&language=en-EN&sensor=false");
                     URLConnection myURLConnection = myURL.openConnection();
@@ -162,13 +139,10 @@ public class SQLRequest {
             e.printStackTrace();
         }
         return null;
-
-
     }
 
-    public static void createObject(String type, String description, boolean disponible, int prix, int duree_partage, int owner_id){
+    public static void createObject(String type, String description, boolean disponible, int prix, int duree_partage, int owner_id, List<String> type_info){
         try{
-
             ResultSet result = request("SELECT COUNT(object_id) AS total FROM objet");
             int current_id = list.add(result.getInt("total"));
             int next_id = current_id + 1;
@@ -183,6 +157,14 @@ public class SQLRequest {
                     prix+", "+
                     duree_partage+", "+
                     owner_id + ")");
+            //Ajout des informations propre au type
+            if (type.equals("maison")){
+                stmt.executeUpdate("INSERT INTO maison (objet_id, annee, superficie, etage, chambre, meuble, stationnement, salle_bain) VALUES ("+next_id+ "," +type_info.get(0)+ "," +type_info.get(1)+ ","+type_info.get(2)+ "," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+","+type_info.get(7)+","+type_info.get(8)+")");
+            } else if (type.equals("auto")) {
+                stmt.executeUpdate("INSERT INTO auto (objet_id, marque, modele, couleur, annee, transmission_manuel, nbPortes, consommation) VALUES ("+next_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\'," +type_info.get(3)+ "," +type_info.get(4)+","+type_info.get(5)+","+type_info.get(6)+")");
+            } else if (type.equals("velo")) {
+                stmt.executeUpdate("INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) VALUES ("+next_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\',\'" +type_info.get(3)+ "\',\'" +type_info.get(4)+"\',\'"+type_info.get(5)+"\',"+type_info.get(6)+","+type_info.get(7)+")");
+            }
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
