@@ -194,6 +194,22 @@ public class SQLRequest {
         return null;
     }
 
+    //Modifie la disponibilite d'un objet
+    public static void changeObjectDisponibility(int objet_id, int dispo){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("UPDATE objet SET disponible = "+dispo+" WHERE objet_id = "+objet_id);
+            stmt.close();
+            con.close();
+            
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    
     //Fonction qui met a jour le prix d'un objet selon l'ID.
     public static void changeObjectPrice(int object_id, int price){
         try{
@@ -356,7 +372,8 @@ public class SQLRequest {
         }
     }
 
-    //Fonction utilisee lorsque l'emprunt prend fin, mise a jour dans la table emprunt et on rend l'ojet disponible a nouveau.
+    //Fonction utilisee lorsque l'emprunt prend fin, mise a jour dans la table emprunt.
+    //Notez que l'objet reste indisponible puisqu'il doit etre remis en partage de facon manuelle par son proprietaire.
     public static void EndShare(int user_id, int object_id){
         try{
             Connection con = JavaConnect.connection();
