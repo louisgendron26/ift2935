@@ -173,7 +173,7 @@ public class SQLRequest {
 
     }
 
-    public static void createUser(String prenom, String nom, String courriel, int numtel, String code_postal, int numero, String rue, String province, String ville){
+    public static int createUser(String prenom, String nom, String courriel, int numtel, String code_postal, int numero, String rue, String province, String ville){
         try{
             ResultSet result = request("SELECT COUNT(object_id) AS total FROM objet");
             int current_id = list.add(result.getInt("total"));
@@ -183,13 +183,13 @@ public class SQLRequest {
             Statement stmt = con.createStatement();
 
             stmt.executeUpdate("INSERT INTO ishare_user (user_id, prenom, nom, courriel, numtel, code_postal, numero, rue, province, ville) VALUES ("+next_id+ ",\'" +prenom+ "\',\'" +nom+ "\',\'" +courriel+ "\'," + numtel + ",\'" + code_postal +"\',"+numero+",\'"+rue+"\',\'"+province+"\',\'"+ville+"\')");
-
+            return next_id;
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
             e.printStackTrace();
         }
-
+        return null;
     }
 
     public static void changeObjectPrice(int object_id,int price){
