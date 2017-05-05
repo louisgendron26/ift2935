@@ -30,7 +30,7 @@ public class JavaConnect {
 	SQLRequest.changeObjectPrice(60,100);
 
 	//UsersTypeInterested
-	SQLRequest.changeObjectDisponibility(1);
+	SQLRequest.changeObjectDisponibility(1,0);
 	
 	//Test pour ajouter un user
 	SQLRequest.createUser("Bibi","Cheval", "abc@hotmail.com", 8332611, "J3V2V2", 30, "rue du tisserand", "QC", "Levis");
