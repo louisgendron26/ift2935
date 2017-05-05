@@ -11,7 +11,7 @@ import java.net.*;
 import java.io.*;
 
 public class SQLRequest {
-
+    //Fonction de base pour faire un query a la base de donnees
     public static ResultSet request(String query) {
         try{
             Connection con = JavaConnect.connection();
@@ -23,12 +23,11 @@ public class SQLRequest {
         }catch (Exception e){
             e.printStackTrace();
         }
-
         return null;
     }
-
+    
+    //Recherche d'objet selon le type (maison, velo ou auto). La fonction retourne la liste de ID des objets.
     public static List<Integer> searchType(String type){
-
         try{
             ResultSet result = request("SELECT objet_id FROM objet WHERE type = \'" + type+"\'");
             List<Integer> list= new ArrayList<>();
@@ -42,11 +41,9 @@ public class SQLRequest {
             e.printStackTrace();
         }
         return null;
-
-
     }
 
-
+    //Recherche d'objets disponibles. La fonction retourne une liste de ID d'objets.
     public static List<Integer> searchObjectByDisponibility(){
         try{
             ResultSet result = request("SELECT objet_id FROM objet WHERE disponible = \'1\'" );
@@ -62,7 +59,8 @@ public class SQLRequest {
         }
         return null;
     }
-
+    
+    //Recherche d'objets selon le prix. La fonction retourne une liste de ID d'objets.
     public static List<Integer> searchObjectByPrice(int lower_price, int higer_price){
         try{
             ResultSet result = request("SELECT objet_id FROM objet WHERE (prix BETWEEN "+lower_price+" AND "+higer_price+")");
@@ -78,7 +76,8 @@ public class SQLRequest {
         }
         return null;
     }
-
+    
+    //Retourne le code postal d'un objet selon le objet id.
     public static String getObjectLocation(int objet_id){
         try{
             ResultSet result = request("SELECT b.code_postal FROM objet a ishare_user b WHERE (a.owner_id = b.user_id) AND a.objet_id = " + objet_id );
@@ -92,7 +91,8 @@ public class SQLRequest {
         }
         return null;
     }
-
+    
+    //Fonction qui retourne la liste d'ID d'objets selon la proximite d'un utilisateur.
     public static List<Integer> searchObjectByProximity(int distance, int user_id){
         try{
             ResultSet result = request("SELECT b.code_postal FROM ishare_user user_id = " + user_id );
@@ -141,7 +141,7 @@ public class SQLRequest {
         return null;
     }
 
-    public static void createObject(String type, String description, boolean disponible, int prix, int duree_partage, int owner_id, List<String> type_info){
+    public static int createObject(String type, String description, boolean disponible, int prix, int duree_partage, int owner_id, List<String> type_info){
         try{
             ResultSet result = request("SELECT COUNT(object_id) AS total FROM objet");
             int current_id = list.add(result.getInt("total"));
@@ -165,14 +165,16 @@ public class SQLRequest {
             } else if (type.equals("velo")) {
                 stmt.executeUpdate("INSERT INTO velo (objet_id, type_velo, marque, modele, cadre, freins, taille_pneus, annee, sexe) VALUES ("+next_id+ ",\'" +type_info.get(0)+ "\',\'" +type_info.get(1)+ "\',\'"+type_info.get(2)+ "\',\'" +type_info.get(3)+ "\',\'" +type_info.get(4)+"\',\'"+type_info.get(5)+"\',"+type_info.get(6)+","+type_info.get(7)+")");
             }
+            return next_id;
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
             e.printStackTrace();
         }
-
+        return null;
     }
-
+    
+    //Fonction qui permet d'ajouter un nouvel utilisateur dans la base de donnees et retourne le ID de l'utilisateur ajoutee
     public static int createUser(String prenom, String nom, String courriel, int numtel, String code_postal, int numero, String rue, String province, String ville){
         try{
             ResultSet result = request("SELECT COUNT(object_id) AS total FROM objet");
@@ -192,7 +194,8 @@ public class SQLRequest {
         return null;
     }
 
-    public static void changeObjectPrice(int object_id,int price){
+    //Fonction qui met a jour le prix d'un objet selon l'ID.
+    public static void changeObjectPrice(int object_id, int price){
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
@@ -205,18 +208,20 @@ public class SQLRequest {
 
     }
 
-    public static void changeObjectShareTime(int share_time){
+    //Mise a jour de la duree de partage d'un objet.
+    public static void changeObjectShareTime(int objet_id, int share_time){
         try{
             Connection con = JavaConnect.connection();
             Statement stmt = con.createStatement();
-            stmt.executeUpdate("UPDATE objet SET dureeMax = \'"+share_time+"\'");
+            stmt.executeUpdate("UPDATE objet SET dureeMax = \'"+share_time+"\' WHERE objet_id = \'"+objet_id+"\'");
         }catch (SQLException se){
             se.printStackTrace();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-
+    
+    //Fonction qui retourne l'ID de l'usager qui avait un objet a une certain date.
     public static List<Integer> findObjectBorrowerByDate(int obj_id, String date){
         try{
             ResultSet result = request("SELECT user_id FROM emprunte WHERE objet_id = "+ obj_id + " AND date_in <= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\') AND date_out >= TO_DATE(\'"+ date + "\', \'DD/MM/YYYY\')");
@@ -235,8 +240,8 @@ public class SQLRequest {
     }
 
     
-
-    public static List<Integer> interrsestedUsers(int objet_id){
+    //Fonction qui retourne la liste d'ID des usagers qui sont interesser par un objet
+    public static List<Integer> interestedUsers(int objet_id){
         try{
             ResultSet result = request("SELECT * FROM interet WHERE objet_id = " + objet_id);
             List<Integer> list= new ArrayList<>();
@@ -251,7 +256,9 @@ public class SQLRequest {
         }
         return null;
     }
-
+    
+    //Fonction qui retourne toutes les infortions d'un objet en une liste de string.
+    //On y retrouve en premier les attributs pour la table 'objet' puis les attributs propre au type de l'objet.
     public static List<String> getObjetInfo(int objet_id){
 
         try{
@@ -305,12 +312,9 @@ public class SQLRequest {
             e.printStackTrace();
         }
         return null;
-
-
-
     }
-
-
+    
+    //Permet d'obtenir toutes les informations d'un utilisateur
     public static List<String> getUserInfo(int user_id){
         try{
             ResultSet result = request("SELECT * FROM ishare_user WHERE user_id = " + user_id);
@@ -336,6 +340,7 @@ public class SQLRequest {
         return null;
     }
 
+    //Fonction utilisee lorsqu'un utilisateur emprunte un objet. On ajoute la transaction dans la table emprunte et on rend l'objet indisponible.
     public static void BeginShare(int user_id, int object_id, int duree){
         try{
             Connection con = JavaConnect.connection();
@@ -351,6 +356,7 @@ public class SQLRequest {
         }
     }
 
+    //Fonction utilisee lorsque l'emprunt prend fin, mise a jour dans la table emprunt et on rend l'ojet disponible a nouveau.
     public static void EndShare(int user_id, int object_id){
         try{
             Connection con = JavaConnect.connection();
