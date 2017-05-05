@@ -192,6 +192,24 @@ public class SQLRequest {
         }
 
     }
+    
+    public static void changeObjectDisponibility(int objet_id){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            ResultSet result = request("SELECT disponible FROM objet WHERE objet_id = "+objet_id);
+            result.next();
+            if (result.getInt("disponible") == 1){
+                stmt.executeUpdate("UPDATE objet SET disponible = 0 WHERE objet_id ="+objet_id);
+            }else{
+                stmt.executeUpdate("UPDATE objet SET disponible = 1 WHERE objet_id ="+objet_id);
+            }
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public static void changeObjectPrice(int object_id,int price){
         try{
