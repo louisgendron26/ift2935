@@ -59,3 +59,11 @@ SELECT e.user_id, u.nom, u.prenom FROM emprunte e, ishare_user u WHERE (e.objet_
 SELECT objet_id FROM objet WHERE owner_id = '008';
 
 SELECT o.id_objet, 'TABLE_TYPE' AS o.type FROM objet o, 'TABLE_TYPE' t WHERE o.id_owner = '008';
+
+
+-- 5. Toutes les infos sur :
+----- a) l'utilisateur sachant son id (user_id):
+SELECT * FROM ishare_user WHERE user_id = 'user_id';
+
+----- b) l'objet sachant son id (objet_id):
+SELECT * FROM objet WHERE objet_id = 'objet_id';
