@@ -335,11 +335,8 @@ INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meu
 INSERT INTO objet (objet_id, type, description, disponible, prix, dureeMax, owner_id) Values (060, 'maison',NULL, 1, 48, 20, 028);
 INSERT INTO maison (objet_id, annee, superficie, etage, chambre, salle_bain, meuble, stationnement) Values (060, NULL, 2000, 2, 4, 2, 1, 0);
 
-
-
 INSERT INTO emprunte(user_id, objet_id, duree, date_in, date_out) Values (011, 021, 14, TO_DATE('01/04/2017', 'DD/MM/YYYY'), TO_DATE('15/04/2017', 'DD/MM/YYYY'));
 INSERT INTO emprunte(user_id, objet_id, duree, date_in, date_out) Values (022, 001, 10, TO_DATE('06/05/2017', 'DD/MM/YYYY'), NULL);
-
 
 INSERT INTO interet(user_id, objet_id) Values (025, 001);
 INSERT INTO interet(user_id, objet_id) Values (009, 040);
