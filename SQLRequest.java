@@ -388,5 +388,45 @@ public class SQLRequest {
             e.printStackTrace();
         }
     }
+    
+    public static List<Integer> notificationsUser(int user_id){
+        try{
+            ResultSet result = request("SELECT objet_id FROM interet WHERE user_id  = " + user_id);
+            List<Integer> list= new ArrayList<>();
+            while (result.next()){
+                list.add(result.getInt("objet_id"));
+            }
+            return list;
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void userIsInterested(int user_id, int objet_id){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO interet (user_id, objet_id) Values (" + user_id + ", " + objet_id + ")" );
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void userIsNotInterested(int user_id, int objet_id){
+        try{
+            Connection con = JavaConnect.connection();
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate("DELETE FROM interet WHERE (user_id = " + user_id + " AND objet_id = " + objet_id + ");" );
+        }catch (SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 }
