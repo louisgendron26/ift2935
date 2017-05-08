@@ -1,4 +1,4 @@
-
+--
 -- REQUÊTES 
 --
 
@@ -24,11 +24,16 @@ SELECT objet_id FROM objet WHERE (prix BETWEEN 0 AND 500 AND type = 'velo');
 
 
 -- 2. Ajout/Mise à jour de la base de donnée
------ a) ajout d'un objet à partager par un utilisateur (owner_id)
-INSERT INTO objet (objet_id, type, description, disponible, prix, duree_partage, owner_id) Values (002, 'auto', NULL, 1, 250, 14, 008);
+----- a) ajout d'un objet d'un certain type à partager par un utilisateur (owner_id)
+INSERT INTO objet (objet_id, type, description, disponible, prix, duree_partage, owner_id) Values (002, 'auto', NULL, 1, 250, 14, 004);
+SELECT 
+INSERT INTO auto (objet_id, annee, marque, km, transmission_manuel, format, consommation) Values (002, 2009, 'BMW', NULL, 0, NULL, NULL);
+
 ----- b) modifier un attribut (ex: disponibilite, duree_partage) d'un objet (objet_id) 
 UPDATE objet SET disponible = '0' WHERE objet_id = '001';
 UPDATE objet SET duree_partage = '20' WHERE objet_id = '021';
+
+
 
 
 -- 3. Modification apportée lorsqu'un utilisateur (user_id) 
@@ -57,5 +62,27 @@ SELECT e.user_id, u.nom, u.prenom FROM emprunte e, ishare_user u WHERE (e.objet_
 
 ---- c) connaître tous les objets (objet_id et autres infos) partagés par un utilisateur (owner_id)
 SELECT objet_id FROM objet WHERE owner_id = '008';
+SELECT o.* FROM objet o, o.type WHERE o.owner_id = '008';
 
-SELECT o.id_objet, 'TABLE_TYPE' AS o.type FROM objet o, 'TABLE_TYPE' t WHERE o.id_owner = '008';
+
+-- 5. Toutes les infos sur :
+----- a) l'utilisateur sachant son id (user_id):
+SELECT * FROM ishare_user WHERE user_id = 'user_id';
+
+----- b) l'objet sachant son id (objet_id):
+SELECT * FROM objet WHERE objet_id = 'objet_id';
+
+-- 6. AUTRES :
+----- a) Sachant objet_id trouver adresse du owner
+SELECT b.code_postal, b.numero, b.rue, b.province, b.ville FROM objet a, ishare_user b WHERE (a.owner_id = b.user_id) AND a.objet_id = '008';
+
+----- b) Sachant user_id trouver code postale
+SELECT code_postal FROM ishare_user WHERE user_id = 'user_id';
+
+---- c) retourne combien d'objet dans table objet et combien de user dans table ishare_user;
+SELECT COUNT(objet_id) FROM objet;
+SELECT COUNT(user_id) FROM ishare_user;
+
+---- d) retourne tous infos sur l'objet dans table objet ET table spécifique au type d'objet;
+TYPE = SELECT type FROM objet WHERE objet_id = '008'
+RESULTAT = SELECT * FROM objet NATURAL JOIN TYPE WHERE objet_id = '008'; 
